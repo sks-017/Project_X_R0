@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      POSTGRES_PASSWORD: example
+    ports: [ '5432:5432' ]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mqtt:
+    image: eclipse-mosquitto
+    ports: [ '1883:1883' ]
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  ingress-api:
+    build: ../ingress-api
+    ports: [ '8000:8000' ]
+    environment:
+      - DATABASE_URL=postgresql://postgres:example@postgres:5432/postgres
+    depends_on:
+      - postgres
+      - mqtt
+
+  dashboard:
+    build: ../dashboard
+    ports: [ '3000:3000' ]
+    depends_on:
+      - ingress-api
+
+volumes:
+  pgdata:
+  mosquitto_data:
+  mosquitto_log:

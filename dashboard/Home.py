@@ -90,6 +90,8 @@ with st.sidebar:
         format_func=lambda x: "⏸️ Paused" if x == 0 else f"⏱️ {x}s",
         key='refresh_interval'
     )
+    # TODO: Optimize this refresh logic. Currently re-renders the whole page.
+    # Should switch to WebSocket for partial updates in v2.0 to reduce server load.
     with st.expander("🔔 Alert Thresholds"):
         st.session_state.alert_config['cycle_time_threshold'] = st.slider(
             "Cycle Time Deviation (%)", 5.0, 20.0, 10.0, 1.0

@@ -101,6 +101,11 @@ def main():
                 for item in batch_payload:
                     session.post(API_URL, json=item, timeout=2.0)
             print(f"Sent batch of {len(batch_payload)} records at {current_time}")
+        except requests.exceptions.ConnectTimeout:
+            print(f"⚠️ Gateway timeout: API at {API_URL} did not respond in 2000ms")
+            # TODO: Implement exponential backoff retry strategy for production resilience
+        except requests.exceptions.ConnectionError:
+            print("❌ Network unreachable. Check API server status or Ethernet connection.")
         except Exception as e:
             print(f"Error sending batch: {e}")
         time.sleep(5)

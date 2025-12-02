@@ -1,6 +1,6 @@
 # 🏭 Industrial Production Control System
 
-> Enterprise-grade real-time monitoring for Injection Molding & Automotive Manufacturing
+> Real-time Andon system for 8-cell injection molding lines. Handles 500+ tags/second via Mitsubishi MC Protocol. Built to replace manual logbooks.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -134,6 +134,12 @@ Includes PostgreSQL with TimescaleDB for production-grade time-series data.
 - [Mitsubishi PLC Integration](docs/MITSUBISHI_R_SERIES_INTEGRATION.md)
 - [Real Machine Integration](docs/REAL_MACHINE_INTEGRATION.md)
 - [Demo Script](docs/DEMO_SCRIPT.md) - Sales presentation guide
+
+## ⚠️ Known Limitations
+
+- **3D Visualization:** Robot position rendering requires WebGL enabled in the browser.
+- **Data Export:** Exporting >10,000 rows to CSV may cause browser lag on older machines.
+- **Refresh Rate:** Default 5s polling may saturate low-bandwidth networks (configurable in settings).
 
 ## 💼 Commercial Use & Support
 

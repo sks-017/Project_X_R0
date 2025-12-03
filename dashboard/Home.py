@@ -73,8 +73,36 @@ if 'alert_config' not in st.session_state:
 alert_system = AlertSystem()
 with st.sidebar:
     try:
-        st.image("assets/logo.png", use_container_width=True)
-    except:
+        # Premium logo styling
+        st.markdown("""
+        <style>
+            .logo-container {
+                padding: 20px 10px;
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                margin-bottom: 20px;
+                text-align: center;
+            }
+            .logo-container img {
+                max-width: 85%;
+                height: auto;
+                filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Display logo with premium container
+        import base64
+        with open("assets/logo.png", "rb") as f:
+            img_data = base64.b64encode(f.read()).decode()
+        
+        st.markdown(f"""
+        <div class="logo-container">
+            <img src="data:image/png;base64,{img_data}" alt="s7 Inc. Logo">
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception as e:
         st.title("🏭 Production Control")
     st.markdown("---")
     if st.session_state.get('user'):

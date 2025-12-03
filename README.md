@@ -20,6 +20,11 @@
 - **Multi-Machine Support** - Monitor 30+ machines simultaneously
 - **Invisible Airbag Facility** - Specialized monitoring for TCM (Cutting) & VWM (Welding)
 
+### 🚀 Coming in V2.0
+- Predictive Maintenance (AI-powered RUL predictions)
+- TechMate AI Chat Assistant (Natural language queries)
+- Digital Twin (3D factory visualization)
+
 ## 🎯 Who Is This For?
 
 - Automotive component manufacturers

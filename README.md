@@ -163,7 +163,7 @@ Includes PostgreSQL with TimescaleDB for production-grade time-series data.
 - Training workshops - ₹50,000/day
 - Annual support contracts
 
-📧 Contact: [your.email@example.com]
+📧 Contact:sk.shukla27@outlook.com
 
 ## 🤝 Contributing
 

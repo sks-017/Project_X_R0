@@ -43,8 +43,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/production-control-system.git
-cd production-control-system
+git clone https://github.com/sks-017/Project_X_R0.git
+cd Project_X_R0
 
 # Install dependencies
 pip install -r ingress-api/requirements.txt

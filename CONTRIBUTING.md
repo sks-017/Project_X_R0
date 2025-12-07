@@ -92,7 +92,7 @@ By contributing, you agree that your contributions will be licensed under the MI
 ## 🙏 Questions?
 
 - Open a GitHub Discussion
-- Email: [your-email@s7inc.com]
+- Email: sk.shukla27@outlook.com
 
 ## 🎯 Priority Areas
 

@@ -91,12 +91,44 @@ python gateway.py
 ## 🔌 PLC Integration
 
 ### Supported Protocols
-- **Mitsubishi R Series** - MC Protocol (pymcprotocol)
-- **Modbus TCP/RTU** - Universal PLC support
-- **OPC UA** - Modern industrial standard
-- **MQTT** - Cloud-native IoT
 
-See [Integration Guide](docs/MITSUBISHI_R_SERIES_INTEGRATION.md)
+| Protocol | Status | Library | Use Case |
+|----------|--------|---------|----------|
+| **Mitsubishi R Series** | ✅ Ready | `pymcprotocol` | MC Protocol (binary) |
+| **Modbus TCP/RTU** | ✅ Ready | `pymodbus` | Universal PLC support |
+| **OPC UA** | ✅ Ready | `opcua-asyncio` | Modern industrial standard |
+| **MQTT** | ✅ Ready | `paho-mqtt` | Cloud-native IoT / Edge |
+
+### Implementation Details
+
+#### Mitsubishi MC Protocol
+```python
+from pymcprotocol import PLCClient
+
+plc = PLCClient("localhost", port=5007)
+plc.connect()
+cycle_time = plc.read("D100")  # Read data register
+```
+
+#### Modbus TCP
+```python
+from pymodbus.client import ModbusTcpClient
+
+client = ModbusTcpClient('192.168.1.100', port=502)
+registers = client.read_holding_registers(0, 10)
+```
+
+#### OPC UA
+```python
+from asyncua import Client
+
+client = Client("opc.tcp://localhost:4840")
+await client.connect()
+node = client.get_node("ns=2;i=2")
+value = await node.read_value()
+```
+
+**📖 See [Integration Guide](docs/MITSUBISHI_PLC_INTEGRATION.md) for complete setup instructions.**
 
 ## 📊 Tech Stack
 

@@ -5,10 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-## 📸 Screenshots
-
-[**Add your screenshots here** - Run the demo and capture 5-8 images]
-
 ## ✨ Features
 
 - **Real-Time OEE Monitoring** - Track Availability × Performance × Quality metrics

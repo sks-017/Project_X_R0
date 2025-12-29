@@ -164,7 +164,6 @@ Includes PostgreSQL with TimescaleDB for production-grade time-series data.
 ## 📖 Documentation
 
 - [Startup Guide](STARTUP_GUIDE.md) - First-time setup
-- [Mitsubishi PLC Integration](docs/MITSUBISHI_R_SERIES_INTEGRATION.md)
 - [Real Machine Integration](docs/REAL_MACHINE_INTEGRATION.md)
 - [Demo Script](docs/DEMO_SCRIPT.md) - Sales presentation guide
 

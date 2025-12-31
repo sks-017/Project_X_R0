@@ -184,13 +184,6 @@ Includes PostgreSQL with TimescaleDB for production-grade time-series data.
 - Production deployments in factories
 - Revenue-generating applications
 
-**Services Available:**
-- Custom PLC integrations - ₹25,000 per protocol
-- Factory deployment & setup - ₹1,50,000 - ₹5,00,000 (Tentative)
-- Training workshops - ₹50,000/day
-- Annual support contracts
-
-📧 Contact:sk.shukla27@outlook.com
 
 ## 🤝 Contributing
 

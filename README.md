@@ -5,6 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
+## 📸 Preview
+![Dashboard](docs/screenshots/dashboard.png)
+
 ## ✨ Features
 
 - **Real-Time OEE Monitoring** - Track Availability × Performance × Quality metrics
@@ -14,7 +17,7 @@
 - **Beautiful Dark UI** - Industrial-grade dashboard with Plotly visualizations
 - **Data Export** - Export production data to CSV/Excel
 - **Multi-Machine Support** - Monitor 30+ machines simultaneously
-- **Invisible Airbag Facility** - Specialized monitoring for TCM (Cutting) & VWM (Welding)
+- **Multi-Process Support** - Specialized monitoring for Cutting (TCM) & Welding (VWM) machines
 
 ### 🚀 Coming in V2.0
 - Predictive Maintenance (AI-powered RUL predictions)
@@ -68,7 +71,7 @@ cd edge
 python gateway.py
 ```
 
-**Login:** `admin` / `admin123`
+**Login:** See `.env.example` for default demo credentials
 
 ## 🏗️ Architecture
 
@@ -202,3 +205,7 @@ Built with modern industrial IoT best practices for the automotive manufacturing
 ---
 
 **⭐ Star this repo if you find it useful!**
+
+## 📬 Contact
+Built by [Sangam Kumar Shukla](https://www.linkedin.com/in/sangam-kumar-shukla-38a136362/) 
+Engineer | Maruti Suzuki India Limited

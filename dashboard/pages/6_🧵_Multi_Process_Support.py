@@ -94,12 +94,12 @@ for idx, (dev_id, data) in enumerate(sorted(assembly_machines.items())):
     with col:
         html = ""
         if dev_id.startswith("TCM"):
-            html = f"""
-            <p><b>{dev_id}</b> - Tear Cutting</p>
-            <p>Pressure: {metrics.get('cut_pressure', 0):.1f} bar</p>
-            <p>Parts Cut: {metrics.get('cycle_count', 0)}</p>
-            <p>Status: ✅ Running</p>
-            """
+            html = (
+                f"<p><b>{dev_id}</b> - Tear Cutting</p>"
+                f"<p>Pressure: {metrics.get('cut_pressure', 0):.1f} bar</p>"
+                f"<p>Parts Cut: {metrics.get('cycle_count', 0)}</p>"
+                f"<p>Status: ✅ Running</p>"
+            )
             render_card("Tear Cutting Machine", metrics, "cyan", html)
             with st.expander(f"📊 {dev_id} Performance"):
                 perf_data = pd.DataFrame({
@@ -121,12 +121,12 @@ for idx, (dev_id, data) in enumerate(sorted(assembly_machines.items())):
                 )
                 st.plotly_chart(fig_perf, use_container_width=True)
         else:
-            html = f"""
-            <p><b>{dev_id}</b> - Vibration Welding</p>
-            <p>Freq: {metrics.get('weld_freq', 0):.0f} Hz</p>
-            <p>Weld Time: {metrics.get('weld_time', 0):.2f} s</p>
-            <p>Status: ✅ Running</p>
-            """
+            html = (
+                f"<p><b>{dev_id}</b> - Vibration Welding</p>"
+                f"<p>Freq: {metrics.get('weld_freq', 0):.0f} Hz</p>"
+                f"<p>Weld Time: {metrics.get('weld_time', 0):.2f} s</p>"
+                f"<p>Status: ✅ Running</p>"
+            )
             render_card("Vibration Welding Machine", metrics, "purple", html)
             with st.expander(f"⚙️ {dev_id} Parameters"):
                 st.metric("Frequency", f"{metrics.get('weld_freq', 0):.0f} Hz", help="Ultrasonic frequency")

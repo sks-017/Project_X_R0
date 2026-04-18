@@ -209,82 +209,101 @@ tcm_vwm_cols = st.columns(4)
 with tcm_vwm_cols[0]:
     tcm01_data = machines.get('TCM-01', {}).get('metrics', {})
     model = tcm01_data.get('model', 'N/A')
-    html = f"""
-    <p style='font-size:16px'><b>TCM-01</b> | <span style='color:#00D9FF'>Model: {model}</span></p>
-    <p>Cut Pressure: {tcm01_data.get('cut_pressure', 0):.1f} bar</p>
-    <p>Parts Cut: {tcm01_data.get('cycle_count', 0)}</p>
-    <p>Status: ✅ Running</p>
-    """
+    html = (
+        f"<p style='font-size:16px'><b>TCM-01</b> | <span style='color:#00D9FF'>Model: {model}</span></p>"
+        f"<p>Cut Pressure: {tcm01_data.get('cut_pressure', 0):.1f} bar</p>"
+        f"<p>Parts Cut: {tcm01_data.get('cycle_count', 0)}</p>"
+        f"<p>Status: ✅ Running</p>"
+    )
     st.markdown(f"""
-    <div class="machine-card" style="border: 1px solid cyan; border-left: 5px solid cyan;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h5 style="margin:0;">✂️ Tear Cutting Machine</h5>
-            <span class="status-badge badge-running">✅ RUNNING</span>
-        </div>
-        <div style="font-size: 0.85em; margin-top: 10px;">
-            {html}
-        </div>
+<div class="machine-card" style="border: 1px solid cyan; border-left: 5px solid cyan; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h5 style="margin:0;">✂️ Tear Cutting</h5>
+        <span class="status-badge badge-running">✅ RUNNING</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div style="font-size: 0.85em; margin-top: 10px;">{html}</div>
+</div>
+""", unsafe_allow_html=True)
+    with st.expander("📊 Performance"):
+        import plotly.graph_objects as go
+        import random
+        import pandas as pd
+        perf_data = pd.DataFrame({'Metric': ['Uptime', 'Efficiency', 'Quality'], 'Value': [random.uniform(95, 99), random.uniform(90, 96), random.uniform(97, 99.5)]})
+        fig = go.Figure(go.Bar(x=perf_data['Metric'], y=perf_data['Value'], text=[f"{v:.1f}%" for v in perf_data['Value']], textposition='outside', marker_color=['#00FF9F', '#00D9FF', '#FF6B00']))
+        fig.update_layout(template='plotly_dark', height=200, yaxis_range=[0, 100], showlegend=False, margin=dict(l=0, r=0, t=10, b=0))
+        st.plotly_chart(fig, use_container_width=True)
+
 with tcm_vwm_cols[1]:
     tcm02_data = machines.get('TCM-02', {}).get('metrics', {})
     model = tcm02_data.get('model', 'N/A')
-    html = f"""
-    <p style='font-size:16px'><b>TCM-02</b> | <span style='color:#00D9FF'>Model: {model}</span></p>
-    <p>Cut Pressure: {tcm02_data.get('cut_pressure', 0):.1f} bar</p>
-    <p>Parts Cut: {tcm02_data.get('cycle_count', 0)}</p>
-    <p>Status: ✅ Running</p>
-    """
+    html = (
+        f"<p style='font-size:16px'><b>TCM-02</b> | <span style='color:#00D9FF'>Model: {model}</span></p>"
+        f"<p>Cut Pressure: {tcm02_data.get('cut_pressure', 0):.1f} bar</p>"
+        f"<p>Parts Cut: {tcm02_data.get('cycle_count', 0)}</p>"
+        f"<p>Status: ✅ Running</p>"
+    )
     st.markdown(f"""
-    <div class="machine-card" style="border: 1px solid cyan; border-left: 5px solid cyan;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h5 style="margin:0;">✂️ Tear Cutting Machine</h5>
-            <span class="status-badge badge-running">✅ RUNNING</span>
-        </div>
-        <div style="font-size: 0.85em; margin-top: 10px;">
-            {html}
-        </div>
+<div class="machine-card" style="border: 1px solid cyan; border-left: 5px solid cyan; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h5 style="margin:0;">✂️ Tear Cutting</h5>
+        <span class="status-badge badge-running">✅ RUNNING</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div style="font-size: 0.85em; margin-top: 10px;">{html}</div>
+</div>
+""", unsafe_allow_html=True)
+    with st.expander("📊 Performance"):
+        import plotly.graph_objects as go
+        import random
+        import pandas as pd
+        perf_data = pd.DataFrame({'Metric': ['Uptime', 'Efficiency', 'Quality'], 'Value': [random.uniform(95, 99), random.uniform(90, 96), random.uniform(97, 99.5)]})
+        fig = go.Figure(go.Bar(x=perf_data['Metric'], y=perf_data['Value'], text=[f"{v:.1f}%" for v in perf_data['Value']], textposition='outside', marker_color=['#00FF9F', '#00D9FF', '#FF6B00']))
+        fig.update_layout(template='plotly_dark', height=200, yaxis_range=[0, 100], showlegend=False, margin=dict(l=0, r=0, t=10, b=0))
+        st.plotly_chart(fig, use_container_width=True)
+
 with tcm_vwm_cols[2]:
     vwm01_data = machines.get('VWM-01', {}).get('metrics', {})
     model = vwm01_data.get('model', 'N/A')
-    html = f"""
-    <p style='font-size:16px'><b>VWM-01</b> | <span style='color:#FF6B00'>Model: {model}</span></p>
-    <p>Weld Freq: {vwm01_data.get('weld_freq', 0):.0f} Hz</p>
-    <p>Weld Time: {vwm01_data.get('weld_time', 0):.2f} s</p>
-    <p>Status: ✅ Running</p>
-    """
+    html = (
+        f"<p style='font-size:16px'><b>VWM-01</b> | <span style='color:#FF6B00'>Model: {model}</span></p>"
+        f"<p>Weld Freq: {vwm01_data.get('weld_freq', 0):.0f} Hz</p>"
+        f"<p>Weld Time: {vwm01_data.get('weld_time', 0):.2f} s</p>"
+        f"<p>Status: ✅ Running</p>"
+    )
     st.markdown(f"""
-    <div class="machine-card" style="border: 1px solid purple; border-left: 5px solid purple;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h5 style="margin:0;">🔧 Vibration Welding</h5>
-            <span class="status-badge badge-running">✅ RUNNING</span>
-        </div>
-        <div style="font-size: 0.85em; margin-top: 10px;">
-            {html}
-        </div>
+<div class="machine-card" style="border: 1px solid purple; border-left: 5px solid purple; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h5 style="margin:0;">🔧 Vibration Welding</h5>
+        <span class="status-badge badge-running">✅ RUNNING</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div style="font-size: 0.85em; margin-top: 10px;">{html}</div>
+</div>
+""", unsafe_allow_html=True)
+    with st.expander("⚙️ Parameters"):
+        st.metric("Frequency", f"{vwm01_data.get('weld_freq', 0):.0f} Hz")
+        st.metric("Amplitude", f"{random.uniform(30, 50):.1f} µm")
+        st.metric("Weld Time", f"{vwm01_data.get('weld_time', 0):.2f} s")
+
 with tcm_vwm_cols[3]:
     vwm02_data = machines.get('VWM-02', {}).get('metrics', {})
     model = vwm02_data.get('model', 'N/A')
-    html = f"""
-    <p style='font-size:16px'><b>VWM-02</b> | <span style='color:#FF6B00'>Model: {model}</span></p>
-    <p>Weld Freq: {vwm02_data.get('weld_freq', 0):.0f} Hz</p>
-    <p>Weld Time: {vwm02_data.get('weld_time', 0):.2f} s</p>
-    <p>Status: ✅ Running</p>
-    """
+    html = (
+        f"<p style='font-size:16px'><b>VWM-02</b> | <span style='color:#FF6B00'>Model: {model}</span></p>"
+        f"<p>Weld Freq: {vwm02_data.get('weld_freq', 0):.0f} Hz</p>"
+        f"<p>Weld Time: {vwm02_data.get('weld_time', 0):.2f} s</p>"
+        f"<p>Status: ✅ Running</p>"
+    )
     st.markdown(f"""
-    <div class="machine-card" style="border: 1px solid purple; border-left: 5px solid purple;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h5 style="margin:0;">🔧 Vibration Welding</h5>
-            <span class="status-badge badge-running">✅ RUNNING</span>
-        </div>
-        <div style="font-size: 0.85em; margin-top: 10px;">
-            {html}
-        </div>
+<div class="machine-card" style="border: 1px solid purple; border-left: 5px solid purple; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h5 style="margin:0;">🔧 Vibration Welding</h5>
+        <span class="status-badge badge-running">✅ RUNNING</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div style="font-size: 0.85em; margin-top: 10px;">{html}</div>
+</div>
+""", unsafe_allow_html=True)
+    with st.expander("⚙️ Parameters"):
+        st.metric("Frequency", f"{vwm02_data.get('weld_freq', 0):.0f} Hz")
+        st.metric("Amplitude", f"{random.uniform(30, 50):.1f} µm")
+        st.metric("Weld Time", f"{vwm02_data.get('weld_time', 0):.2f} s")
 st.markdown("---")
 st.caption("💡 Multi-Process Support produces safety-critical components for multi-process systems")

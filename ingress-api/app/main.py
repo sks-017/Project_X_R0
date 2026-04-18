@@ -26,7 +26,7 @@ def generate_metrics(device):
     device_id = device["id"]
     metrics = {}
     IMM_MODELS = {"IMM-01": "AB-X100", "IMM-02": "AB-X200", "IMM-03": "AB-Y50", "IMM-04": "AB-Z99", "IMM-05": "AB-W150", "IMM-06": "AB-T300", "IMM-07": "AB-M75", "IMM-08": "AB-P200"}
-    AIRBAG_MODELS = {"TCM-01": "IAB-CUT-A", "TCM-02": "IAB-CUT-B", "VWM-01": "IAB-WELD-X", "VWM-02": "IAB-WELD-Y"}
+    PROCESS_MODELS = {"TCM-01": "IAB-CUT-A", "TCM-02": "IAB-CUT-B", "VWM-01": "IAB-WELD-X", "VWM-02": "IAB-WELD-Y"}
     if dtype == "IMM":
         metrics = {"cycle_time": random.uniform(28, 42), "mold_temp": random.normalvariate(60, 2.0), "machine_temp": random.normalvariate(45, 1.5), "clamping_pressure": random.uniform(1800, 2500), "vibration": random.random() * 0.2, "zone_temps": [random.uniform(180, 220) for _ in range(48)], "mold_model": IMM_MODELS.get(device_id, "UNKNOWN")}
     elif dtype == "QMC":
@@ -38,9 +38,9 @@ def generate_metrics(device):
     elif dtype == "ROBOT":
         metrics = {"axis_x": random.uniform(0, 1000), "axis_y": random.uniform(0, 500), "axis_z": random.uniform(0, 800), "grip_pressure": random.normalvariate(5, 0.1)}
     elif dtype == "TCM":
-        metrics = {"cut_pressure": random.normalvariate(100, 5.0), "cycle_count": random.randint(0, 1000), "model": AIRBAG_MODELS.get(device_id, "UNKNOWN")}
+        metrics = {"cut_pressure": random.normalvariate(100, 5.0), "cycle_count": random.randint(0, 1000), "model": PROCESS_MODELS.get(device_id, "UNKNOWN")}
     elif dtype == "VWM":
-        metrics = {"weld_freq": random.normalvariate(20000, 100), "weld_time": random.normalvariate(2.5, 0.1), "model": AIRBAG_MODELS.get(device_id, "UNKNOWN")}
+        metrics = {"weld_freq": random.normalvariate(20000, 100), "weld_time": random.normalvariate(2.5, 0.1), "model": PROCESS_MODELS.get(device_id, "UNKNOWN")}
     return metrics
 
 latest_telemetry = {}

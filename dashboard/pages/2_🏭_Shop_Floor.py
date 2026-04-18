@@ -203,7 +203,7 @@ for i in range(1, 9):
                 st.caption(f"📍 Position: X={x_pos:.0f}mm, Y={y_pos:.0f}mm, Z={z_pos:.0f}mm")
         st.markdown("---")
 st.markdown("---")
-st.title("🧵 Invisible Airbag Facility")
+st.title("🧵 Multi-Process Support")
 st.subheader("Assembly Equipment - Cutting & Welding Operations")
 tcm_vwm_cols = st.columns(4)
 with tcm_vwm_cols[0]:
@@ -287,4 +287,4 @@ with tcm_vwm_cols[3]:
     </div>
     """, unsafe_allow_html=True)
 st.markdown("---")
-st.caption("💡 Airbag Facility produces safety-critical components for automotive airbag systems")
+st.caption("💡 Multi-Process Support produces safety-critical components for multi-process systems")

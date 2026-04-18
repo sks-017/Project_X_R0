@@ -25,7 +25,7 @@ machines = fetch_data()
 
 # --- Sidebar Navigation ---
 st.sidebar.title("🏭 Production Control System")
-page = st.sidebar.radio("Navigate", ["Executive Summary", "Shop Floor (Cells)", "Invisible Airbag Facility"])
+page = st.sidebar.radio("Navigate", ["Executive Summary", "Shop Floor (Cells)", "Multi-Process Support"])
 
 st.sidebar.markdown("---")
 if st.sidebar.button("Refresh Data"):
@@ -233,9 +233,9 @@ elif page == "Shop Floor (Cells)":
             
             st.markdown("---")
 
-# --- Page: Invisible Airbag Facility ---
-elif page == "Invisible Airbag Facility":
-    st.title("🧵 Invisible Airbag Facility")
+# --- Page: Multi-Process Support ---
+elif page == "Multi-Process Support":
+    st.title("🧵 Multi-Process Support")
     
     cols = st.columns(4)
     

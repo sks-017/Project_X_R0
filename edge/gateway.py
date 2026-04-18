@@ -31,7 +31,7 @@ def generate_metrics(device):
         "IMM-07": "AB-M75",
         "IMM-08": "AB-P200"
     }
-    AIRBAG_MODELS = {
+    PROCESS_MODELS = {
         "TCM-01": "IAB-CUT-A",
         "TCM-02": "IAB-CUT-B",
         "VWM-01": "IAB-WELD-X",
@@ -73,13 +73,13 @@ def generate_metrics(device):
         metrics = {
             "cut_pressure": random.normalvariate(100, 5.0),
             "cycle_count": random.randint(0, 1000),
-            "model": AIRBAG_MODELS.get(device_id, "UNKNOWN")
+            "model": PROCESS_MODELS.get(device_id, "UNKNOWN")
         }
     elif dtype == "VWM":
         metrics = {
             "weld_freq": random.normalvariate(20000, 100),
             "weld_time": random.normalvariate(2.5, 0.1),
-            "model": AIRBAG_MODELS.get(device_id, "UNKNOWN")
+            "model": PROCESS_MODELS.get(device_id, "UNKNOWN")
         }
     return metrics
 def main():

@@ -248,7 +248,7 @@ with col_left:
         - Carbon footprint
         """)
         st.success("""
-        **🧵 Invisible Airbag Facility**
+        **🧵 Multi-Process Support**
         - Assembly equipment
         - Cutting machines
         - Welding stations

@@ -1,11 +1,11 @@
-"""Invisible Airbag Facility Dashboard - Production Control System"""
+"""Multi-Process Support Dashboard - Production Control System"""
 import streamlit as st
 import requests
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import datetime, timedelta
 import random
-st.set_page_config(page_title="Invisible Airbag Facility", page_icon="🧵", layout="wide")
+st.set_page_config(page_title="Multi-Process Support", page_icon="🧵", layout="wide")
 API_URL = "http://localhost:8000/api/v1/telemetry/latest"
 @st.cache_data(ttl=2)
 def fetch_data():
@@ -17,7 +17,7 @@ def fetch_data():
         pass
     return {}
 machines = fetch_data()
-st.title("🧵 Invisible Airbag Facility - Production Dashboard")
+st.title("🧵 Multi-Process Support - Production Dashboard")
 tcm_count = len([k for k in machines.keys() if k.startswith('TCM')])
 vwm_count = len([k for k in machines.keys() if k.startswith('VWM')])
 total_parts_cut = sum([machines.get(k, {}).get('metrics', {}).get('cycle_count', 0) for k in machines.keys() if k.startswith('TCM')])
@@ -134,7 +134,7 @@ for idx, (dev_id, data) in enumerate(sorted(assembly_machines.items())):
                 st.metric("Weld Time", f"{metrics.get('weld_time', 0):.2f} s", help="Duration per weld")
                 st.metric("Hold Time", f"{random.uniform(1, 2):.1f} s", help="Cooling hold time")
 st.markdown("---")
-st.subheader("🎯 Quality Analysis - Airbag Components")
+st.subheader("🎯 Quality Analysis - Multi-Process Components")
 c3, c4 = st.columns(2)
 with c3:
     st.subheader("Common Defects (Last 24h)")
@@ -163,4 +163,4 @@ with c4:
         'Status': ['✅', '✅', '✅', '✅']
     })
     st.dataframe(metrics_df, use_container_width=True, hide_index=True)
-    st.info("💡 **Insight**: All metrics within target range. Quality performance excellent for airbag safety components.")
+    st.info("💡 **Insight**: All metrics within target range. Quality performance excellent for safety components.")

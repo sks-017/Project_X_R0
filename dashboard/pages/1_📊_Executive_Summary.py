@@ -457,7 +457,7 @@ with c6:
         with st.expander("📊 Equipment OEE Breakdown"):
             st.dataframe(oee_df.round(1), use_container_width=True)
 st.markdown("---")
-st.subheader("🧵 Invisible Airbag Facility - Equipment Performance")
+st.subheader("🧵 Multi-Process Support - Equipment Performance")
 c7, c8 = st.columns(2)
 with c7:
     st.subheader("✂️ Tear Cutting Machines (TCM) OEE")
@@ -526,22 +526,22 @@ with c8:
         st.plotly_chart(fig8, use_container_width=True)
         st.caption(f"📊 Avg VWM OEE: {vwm_df['OEE %'].mean():.1f}%")
 st.markdown("---")
-st.subheader("🧵 Invisible Airbag Facility - Model Production")
+st.subheader("🧵 Multi-Process Support - Model Production")
 c9, c10 = st.columns(2)
 with c9:
     st.subheader("✂️ Cutting Models Production")
-    airbag_models = {}
+    process_models = {}
     for dev_id in [k for k in machines.keys() if k.startswith('TCM')]:
         metrics = machines.get(dev_id, {}).get('metrics', {})
         model = metrics.get('model', 'Unknown')
         count = metrics.get('cycle_count', 0)
-        airbag_models[model] = airbag_models.get(model, 0) + count
-    if airbag_models:
-        airbag_df = pd.DataFrame(list(airbag_models.items()), columns=['Model', 'Parts Cut'])
+        process_models[model] = process_models.get(model, 0) + count
+    if process_models:
+        process_df = pd.DataFrame(list(process_models.items()), columns=['Model', 'Parts Cut'])
         fig9 = go.Figure(go.Bar(
-            x=airbag_df['Model'],
-            y=airbag_df['Parts Cut'],
-            text=[f"<b>{int(v)}</b>" for v in airbag_df['Parts Cut']],
+            x=process_df['Model'],
+            y=process_df['Parts Cut'],
+            text=[f"<b>{int(v)}</b>" for v in process_df['Parts Cut']],
             textposition='outside',
             textfont=dict(size=18, color='white', family='Arial Black'),
             marker_color=['#00D9FF', '#FF6B00']

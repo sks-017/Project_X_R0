@@ -109,10 +109,10 @@ VALUES
     ('IMM-06', 'IMM', 'Injection Molding Machine 6', 'Cell-06', '2023-03-10', true),
     ('IMM-07', 'IMM', 'Injection Molding Machine 7', 'Cell-07', '2023-04-05', true),
     ('IMM-08', 'IMM', 'Injection Molding Machine 8', 'Cell-08', '2023-04-05', true),
-    ('TCM-01', 'TCM', 'Tear Cutting Machine 1', 'Airbag-Line', '2023-05-01', true),
-    ('TCM-02', 'TCM', 'Tear Cutting Machine 2', 'Airbag-Line', '2023-05-01', true),
-    ('VWM-01', 'VWM', 'Vibration Welding Machine 1', 'Airbag-Line', '2023-06-15', true),
-    ('VWM-02', 'VWM', 'Vibration Welding Machine 2', 'Airbag-Line', '2023-06-15', true)
+    ('TCM-01', 'TCM', 'Tear Cutting Machine 1', 'Multi-Process-Line', '2023-05-01', true),
+    ('TCM-02', 'TCM', 'Tear Cutting Machine 2', 'Multi-Process-Line', '2023-05-01', true),
+    ('VWM-01', 'VWM', 'Vibration Welding Machine 1', 'Multi-Process-Line', '2023-06-15', true),
+    ('VWM-02', 'VWM', 'Vibration Welding Machine 2', 'Multi-Process-Line', '2023-06-15', true)
 ON CONFLICT (equipment_id) DO NOTHING;
 
 -- Data retention policy (keep 180 days using TimescaleDB)

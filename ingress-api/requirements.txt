@@ -1,5 +1,9 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
-asyncpg
+sqlalchemy
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+python-dotenv
 websockets

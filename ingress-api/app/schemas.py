@@ -26,6 +26,7 @@ class EquipmentResponse(BaseModel):
     active: bool
     created_at: datetime
     class Config:
+        orm_mode = True
         from_attributes = True
 class AlertCreate(BaseModel):
     """Schema for creating alerts"""
@@ -43,6 +44,7 @@ class AlertResponse(BaseModel):
     acknowledged: bool
     created_at: datetime
     class Config:
+        orm_mode = True
         from_attributes = True
 class UserBase(BaseModel):
     """Base user schema"""
@@ -64,6 +66,7 @@ class UserResponse(UserBase):
     created_at: datetime
     last_login: Optional[datetime]
     class Config:
+        orm_mode = True
         from_attributes = True
 class Token(BaseModel):
     """Schema for JWT token"""

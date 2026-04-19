@@ -317,4 +317,12 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
 @app.get("/users/me", response_model=UserResponse)
 async def read_users_me(current_user: models.User = Depends(auth.get_current_active_user)):
     """Get current logged in user profile"""
-    return current_user
+    return {
+        "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": current_user.role,
+        "active": current_user.active,
+        "created_at": current_user.created_at,
+        "last_login": current_user.last_login,
+    }

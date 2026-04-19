@@ -1,9 +1,12 @@
 services:
   - type: web
     name: project-x-r0-api
-    env: docker
+    runtime: docker
     plan: free
-    rootDir: ingress-api
+    dockerfilePath: ./ingress-api/Dockerfile
+    dockerContext: ./ingress-api
+    healthCheckPath: /health
+    autoDeployTrigger: commit
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -14,9 +17,11 @@ services:
 
   - type: web
     name: project-x-r0-dashboard
-    env: docker
+    runtime: docker
     plan: free
-    rootDir: dashboard
+    dockerfilePath: ./dashboard/Dockerfile
+    dockerContext: ./dashboard
+    autoDeployTrigger: commit
     envVars:
       - key: API_URL
         value: https://project-x-r0-api.onrender.com

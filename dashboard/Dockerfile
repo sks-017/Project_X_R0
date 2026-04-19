@@ -7,4 +7,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD streamlit run Home.py --server.address=0.0.0.0 --server.port=${PORT:-8501}
+EXPOSE 8501
+
+CMD ["sh", "-c", "streamlit run Home.py --server.address=0.0.0.0 --server.port=${PORT:-8501}"]

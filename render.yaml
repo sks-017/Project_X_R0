@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: project-x-r0-api
+    env: docker
+    plan: free
+    rootDir: ingress-api
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+
+  - type: web
+    name: project-x-r0-dashboard
+    env: docker
+    plan: free
+    rootDir: dashboard
+    envVars:
+      - key: API_URL
+        value: https://project-x-r0-api.onrender.com

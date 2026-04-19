@@ -6,10 +6,12 @@ from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
 import random
+import os
 
 st.set_page_config(page_title="Production Control System", layout="wide", initial_sidebar_state="expanded")
 
-API_URL = "http://localhost:8000/api/v1/telemetry/latest"
+API_BASE_URL = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
+API_URL = f"{API_BASE_URL}/api/v1/telemetry/latest"
 
 # --- Data Fetching ---
 def fetch_data():

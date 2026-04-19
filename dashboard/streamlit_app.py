@@ -79,7 +79,7 @@ if page == "Executive Summary":
     with c1:
         st.subheader("📈 Production Volume Trends (Last 24h)")
         # Generate realistic hourly data
-        hours = pd.date_range(end=datetime.now(), periods=24, freq='H')
+        hours = pd.date_range(end=datetime.now(), periods=24, freq='h')
         production_data = pd.DataFrame({
             'Time': hours,
             'Parts Produced': [random.randint(180, 260) for _ in range(24)],

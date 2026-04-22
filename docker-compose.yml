@@ -37,7 +37,7 @@ services:
     build: ./dashboard
     container_name: prodcontrol_dashboard
     environment:
-      API_URL: http://api:8000/api/v1
+      API_URL: http://api:8000
     ports:
       - "8501:8501"
     depends_on:

@@ -7,7 +7,7 @@ from sqlalchemy.pool import QueuePool
 import os
 from dotenv import load_dotenv
 load_dotenv()
-DATABASE_URL = "sqlite:///./prodcontrol.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./prodcontrol.db")
 if "sqlite" in DATABASE_URL:
     engine = create_engine(
         DATABASE_URL,

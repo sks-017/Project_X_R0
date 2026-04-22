@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: project-x-r0-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./ingress-api/Dockerfile
+    dockerContext: ./ingress-api
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+      - key: DEMO_ADMIN_PASSWORD
+        value: admin123
+
+  - type: web
+    name: project-x-r0-dashboard
+    runtime: docker
+    plan: free
+    dockerfilePath: ./dashboard/Dockerfile
+    dockerContext: ./dashboard
+    autoDeployTrigger: commit
+    envVars:
+      - key: API_URL
+        value: https://project-x-r0-api.onrender.com

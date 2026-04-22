@@ -107,10 +107,17 @@ async def background_simulator_loop():
 def seed_database():
     db = SessionLocal()
     try:
+        demo_admin_password = os.getenv("DEMO_ADMIN_PASSWORD", "admin123")
+        hashed_password = auth.get_password_hash(demo_admin_password)
         admin_user = db.query(models.User).filter(models.User.username == "admin").first()
-        if not admin_user:
+        if admin_user:
+            print("[INIT] Resetting demo admin credentials...")
+            admin_user.email = "admin@example.com"
+            admin_user.password_hash = hashed_password
+            admin_user.role = "admin"
+            admin_user.active = True
+        else:
             print("[INIT] Creating default admin user...")
-            hashed_password = auth.get_password_hash("admin123")
             new_admin = models.User(
                 username="admin",
                 email="admin@example.com",
@@ -119,9 +126,17 @@ def seed_database():
                 active=True
             )
             db.add(new_admin)
-            
-            print("[INIT] Seeding equipment...")
-            for device in DEVICES:
+
+        print("[INIT] Seeding equipment...")
+        for device in DEVICES:
+            equipment = db.query(models.Equipment).filter(
+                models.Equipment.equipment_id == device["id"]
+            ).first()
+            if equipment:
+                equipment.equipment_type = device["type"]
+                equipment.description = f"{device['type']} Unit {device['id'].split('-')[-1]}"
+                equipment.active = True
+            else:
                 eq = models.Equipment(
                     equipment_id=device["id"],
                     equipment_type=device["type"],
@@ -129,9 +144,9 @@ def seed_database():
                     active=True
                 )
                 db.add(eq)
-                
-            db.commit()
-            print("[INIT] Default admin and equipment seeded successfully.")
+
+        db.commit()
+        print("[INIT] Demo admin and equipment seeded successfully.")
     except Exception as e:
         print(f"Failed to seed DB: {e}")
     finally:

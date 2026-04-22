@@ -14,6 +14,8 @@ services:
         generateValue: true
       - key: DEBUG
         value: "false"
+      - key: DEMO_ADMIN_PASSWORD
+        value: admin123
 
   - type: web
     name: project-x-r0-dashboard

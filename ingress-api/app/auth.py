@@ -15,7 +15,8 @@ from app import models, schemas, database
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "change-this-to-random-string-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("SESSION_TIMEOUT_MINUTES", "30"))
+VALID_ROLES = {"admin", "manager", "supervisor", "maintenance", "operator"}
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def verify_password(plain_password, hashed_password):
@@ -34,6 +35,22 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+def normalize_role(role: str) -> str:
+    role = (role or "operator").strip().lower()
+    return role if role in VALID_ROLES else "operator"
+
+def require_roles(*roles: str):
+    """FastAPI dependency factory for role-based endpoints."""
+    allowed_roles = {normalize_role(role) for role in roles}
+    def _checker(current_user: models.User = Depends(get_current_active_user)):
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions"
+            )
+        return current_user
+    return _checker
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
     """Dependency to get current authenticated user"""
     credentials_exception = HTTPException(

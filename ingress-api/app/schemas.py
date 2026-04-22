@@ -2,7 +2,7 @@
 Pydantic schemas for API request/response validation
 """
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from datetime import datetime
 class TelemetryInput(BaseModel):
     """Input schema for telemetry data"""
@@ -28,6 +28,44 @@ class EquipmentResponse(BaseModel):
     class Config:
         orm_mode = True
         from_attributes = True
+
+class MachineSetup(BaseModel):
+    """Machine master setup payload."""
+    equipment_id: str
+    equipment_type: str
+    description: Optional[str] = None
+    plant: str
+    line: str
+    cell: str
+    process: str
+    mold_model: Optional[str] = None
+    plc_protocol: str = "simulator"
+    plc_address: Optional[str] = None
+    cycle_time_standard: float = 35.0
+    target_per_hour: int = 240
+
+class DowntimeCreate(BaseModel):
+    equipment_id: str
+    reason_code: str
+    category: str
+    minutes: float
+    comment: Optional[str] = None
+
+class OeeResponse(BaseModel):
+    equipment_id: str
+    availability: float
+    performance: float
+    quality: float
+    oee: float
+    loss_tree: Dict[str, float]
+
+class HealthResponse(BaseModel):
+    status: str
+    checks: Dict[str, Any]
+    timestamp: datetime
+
+class DemoLogin(BaseModel):
+    role: str = "operator"
 class AlertCreate(BaseModel):
     """Schema for creating alerts"""
     equipment_id: str
@@ -72,6 +110,8 @@ class Token(BaseModel):
     """Schema for JWT token"""
     access_token: str
     token_type: str
+    expires_in: int = 1800
+    role: Optional[str] = None
 class TokenData(BaseModel):
     """Schema for token payload"""
     username: Optional[str] = None

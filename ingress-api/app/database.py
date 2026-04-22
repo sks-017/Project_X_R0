@@ -8,6 +8,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./prodcontrol.db")
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 if "sqlite" in DATABASE_URL:
     engine = create_engine(
         DATABASE_URL,
@@ -48,7 +50,8 @@ def init_db():
 def check_db_connection():
     """Health check for database connection"""
     try:
-        engine.connect()
+        connection = engine.connect()
+        connection.close()
         return True
     except Exception as e:
         print(f"[ERROR] Database connection failed: {e}")

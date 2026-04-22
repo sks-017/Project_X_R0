@@ -1,211 +1,110 @@
-# 🏭 Industrial Production Control System
+# GE Pulse
 
-> Real-time Andon system for 8-cell injection molding lines. Handles 500+ tags/second via Mitsubishi MC Protocol. Built to replace manual logbooks.
+**Factory rhythm, clear.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+GE Pulse is a shop-floor intelligence platform from **S7 Inc** for injection molding and automotive component factories. It combines live machine telemetry, OEE, downtime capture, machine master data, role-based demo screens, and connector-ready edge ingestion.
 
-## 📸 Preview
-![Dashboard](docs/screenshots/dashboard.png)
+## What Works Now
 
-## ✨ Features
+- FastAPI backend with JWT auth, demo mode, role-based access, and session timeout.
+- Streamlit dashboard branded for GE Pulse and S7 Inc.
+- Persistent database support for PostgreSQL on Render and local TimescaleDB/PostgreSQL through Docker.
+- Health checks for API, dashboard dependency, database, and simulator.
+- Demo factory seed/reset with plants, lines, cells, machines, processes, mold models, shifts, targets, alert rules, connector configs, and users.
+- Machine master API: plant, line, cell, machine, process, mold/model, PLC protocol, target, and cycle-time standard.
+- Downtime reason capture for machine stop, material shortage, quality issue, changeover, and maintenance.
+- OEE API with availability, performance, quality, and loss-tree output.
+- Edge connector interfaces for Mitsubishi MC Protocol, Modbus TCP, OPC UA, MQTT, and simulator mode.
+- Automated API tests and GitHub Actions CI.
 
-- **Real-Time OEE Monitoring** - Track Availability × Performance × Quality metrics
-- **48-Zone Thermal Heatmaps** - Interactive temperature monitoring for injection molding machines
-- **PLC Integration Ready** - Mitsubishi R Series (MC Protocol), Modbus, OPC UA support
-- **JWT Authentication** - Secure login with Role-Based Access Control (Admin, Manager, Operator)
-- **Beautiful Dark UI** - Industrial-grade dashboard with Plotly visualizations
-- **Data Export** - Export production data to CSV/Excel
-- **Multi-Machine Support** - Monitor 30+ machines simultaneously
-- **Multi-Process Support** - Specialized monitoring for Cutting (TCM) & Welding (VWM) machines
+## Demo Credentials
 
-### 🚀 Coming in V2.0
-- Predictive Maintenance (AI-powered RUL predictions)
-- TechMate AI Chat Assistant (Natural language queries)
-- Digital Twin (3D factory visualization)
+Use the dashboard **Launch Demo** button for passwordless role testing.
 
-## 🎯 Who Is This For?
+Local password login is also available:
 
-- Automotive component manufacturers
-- Injection molding plants (8+ machines)
-- Factory automation integrators
-- Industrial IoT solution providers
-- Manufacturing consultants
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.10+
-- Windows/Linux/macOS
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/sks-017/Project_X_R0.git
-cd Project_X_R0
-
-# Install dependencies
-pip install -r ingress-api/requirements.txt
-pip install -r dashboard/requirements.txt
-pip install -r edge/requirements.txt
+```text
+Username: admin
+Password: admin123
 ```
 
-### Run Demo (3 Terminals)
+Set `DEMO_ADMIN_PASSWORD` to override the local demo password.
 
-**Terminal 1: API**
+## Quick Start
+
+Install dependencies:
+
+```bash
+python -m pip install -r ingress-api/requirements.txt
+python -m pip install -r dashboard/requirements.txt
+python -m pip install -r edge/requirements.txt
+```
+
+Run the API:
+
 ```bash
 cd ingress-api
 uvicorn app.main:app --reload --port 8000
 ```
 
-**Terminal 2: Dashboard**
+Run the dashboard:
+
 ```bash
 cd dashboard
 streamlit run Home.py
 ```
 
-**Terminal 3: Data Gateway (Simulation)**
-```bash
-cd edge
-python gateway.py
-```
+Open:
 
-**Login:** See `.env.example` for default demo credentials
+- API health: http://localhost:8000/health
+- API docs: http://localhost:8000/docs
+- Dashboard: http://localhost:8501
 
-## 🏗️ Architecture
-
-```
-┌─────────────┐      ┌──────────┐      ┌───────────┐
-│   PLCs      │─────▶│ Gateway  │─────▶│    API    │
-│ (Machines)  │      │ (Edge)   │      │ (FastAPI) │
-└─────────────┘      └──────────┘      └─────┬─────┘
-                                              │
-                                        ┌─────▼─────┐
-                                        │ Dashboard │
-                                        │(Streamlit)│
-                                        └───────────┘
-```
-
-## 🔌 PLC Integration
-
-### Supported Protocols
-
-| Protocol | Status | Library | Use Case |
-|----------|--------|---------|----------|
-| **Mitsubishi R Series** | ✅ Ready | `pymcprotocol` | MC Protocol (binary) |
-| **Modbus TCP/RTU** | ✅ Ready | `pymodbus` | Universal PLC support |
-| **OPC UA** | ✅ Ready | `opcua-asyncio` | Modern industrial standard |
-| **MQTT** | ✅ Ready | `paho-mqtt` | Cloud-native IoT / Edge |
-
-### Implementation Details
-
-#### Mitsubishi MC Protocol
-```python
-from pymcprotocol import PLCClient
-
-plc = PLCClient("localhost", port=5007)
-plc.connect()
-cycle_time = plc.read("D100")  # Read data register
-```
-
-#### Modbus TCP
-```python
-from pymodbus.client import ModbusTcpClient
-
-client = ModbusTcpClient('192.168.1.100', port=502)
-registers = client.read_holding_registers(0, 10)
-```
-
-#### OPC UA
-```python
-from asyncua import Client
-
-client = Client("opc.tcp://localhost:4840")
-await client.connect()
-node = client.get_node("ns=2;i=2")
-value = await node.read_value()
-```
-
-**📖 See [Integration Guide](docs/MITSUBISHI_PLC_INTEGRATION.md) for complete setup instructions.**
-
-## 📊 Tech Stack
-
-- **Backend:** FastAPI, SQLAlchemy, Pydantic
-- **Frontend:** Streamlit, Plotly (3D charts, heatmaps)
-- **Database:** SQLite (dev) / PostgreSQL (production)
-- **Security:** JWT (python-jose), Password Hashing (passlib)
-- **Edge:** Python requests (batch ingestion)
-
-## 📁 Project Structure
-
-```
-├── ingress-api/       # FastAPI backend
-│   ├── app/
-│   │   ├── main.py           # API endpoints
-│   │   ├── auth.py           # JWT authentication
-│   │   ├── models.py         # Database models
-│   │   └── database.py       # Database connection
-│   └── requirements.txt
-├── dashboard/         # Streamlit frontend
-│   ├── Home.py               # Main dashboard
-│   ├── pages/                # Multi-page app
-│   └── utils/                # Alert system, exports
-├── edge/              # Data gateway (PLC simulator)
-│   └── gateway.py
-└── docs/              # Integration guides
-```
-
-## 🐳 Docker Deployment (Optional)
+## Docker Demo
 
 ```bash
-docker-compose up
+docker-compose up --build
 ```
 
-Includes PostgreSQL with TimescaleDB for production-grade time-series data.
+The compose stack includes TimescaleDB/PostgreSQL, the API, the dashboard, and the simulator gateway.
 
-## 📖 Documentation
+## Render Deployment
 
-- [Startup Guide](STARTUP_GUIDE.md) - First-time setup
-- [Real Machine Integration](docs/REAL_MACHINE_INTEGRATION.md)
-- [Demo Script](docs/DEMO_SCRIPT.md) - Sales presentation guide
+`render.yaml` provisions:
 
-## ⚠️ Known Limitations
+- `ge-pulse-postgres`
+- `ge-pulse-api`
+- `ge-pulse-dashboard`
 
-- **3D Visualization:** Robot position rendering requires WebGL enabled in the browser.
-- **Data Export:** Exporting >10,000 rows to CSV may cause browser lag on older machines.
-- **Refresh Rate:** Default 5s polling may saturate low-bandwidth networks (configurable in settings).
+The API receives `DATABASE_URL` from Render PostgreSQL. SQLite remains available only as a local fallback.
 
-## 💼 Commercial Use & Support
+## API Highlights
 
-**Free for:**
-- Personal projects
-- Educational institutions
-- Open-source projects
+- `POST /api/v1/auth/demo-login`
+- `GET /api/v1/health`
+- `GET /api/v1/factory/machines`
+- `POST /api/v1/factory/machines`
+- `POST /api/v1/demo/reset`
+- `GET /api/v1/oee`
+- `POST /api/v1/downtime`
+- `GET /api/v1/connectors`
+- `GET /api/v1/telemetry/latest`
 
-**Commercial License Required for:**
-- Production deployments in factories
-- Revenue-generating applications
+## Test
 
+```bash
+pytest -q
+```
 
-## 🤝 Contributing
+## Roadmap
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md)
+1. Harden PostgreSQL migrations with Alembic.
+2. Build richer operator, supervisor, maintenance, manager, and admin screens.
+3. Add live Andon board, escalation workflow, and notification providers.
+4. Move high-volume telemetry to TimescaleDB hypertables or ClickHouse.
+5. Add edge offline buffering and production connector configuration UI.
+6. Add predictive maintenance and the GE Pulse AI assistant.
 
-## 📝 License
+## License
 
-Dual licensed:
-- MIT License (see [LICENSE](LICENSE)) for non-commercial use
-- Commercial License available - contact for pricing
-
-## 🙏 Acknowledgments
-
-Built with modern industrial IoT best practices for the automotive manufacturing industry.
-
----
-
-**⭐ Star this repo if you find it useful!**
-
-## 📬 Contact
-Built by [Sangam Kumar Shukla](https://www.linkedin.com/in/sangam-kumar-shukla-38a136362/) 
-Engineer | Maruti Suzuki India Limited
+MIT. Commercial deployment terms can be added separately for production factory use.

@@ -2,8 +2,10 @@ fastapi
 uvicorn[standard]
 pydantic
 sqlalchemy
+psycopg2-binary
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
 python-dotenv
 websockets
+httpx

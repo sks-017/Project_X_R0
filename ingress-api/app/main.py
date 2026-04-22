@@ -2,16 +2,35 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPExcept
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from .schemas import TelemetryInput, EquipmentResponse, AlertCreate, AlertResponse, UserCreate, UserResponse, Token
+from .schemas import (
+    TelemetryInput,
+    EquipmentResponse,
+    AlertCreate,
+    AlertResponse,
+    UserCreate,
+    UserResponse,
+    Token,
+    DemoLogin,
+    DowntimeCreate,
+    MachineSetup,
+    OeeResponse,
+)
 from . import models, auth
 from .database import engine, get_db, init_db, check_db_connection, SessionLocal
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import asyncio
 import os
 import random
 
-app = FastAPI(title="Production Control System API", version="1.0")
+APP_NAME = "GE Pulse"
+BRAND_OWNER = "S7 Inc"
+TAGLINE = "Factory rhythm, clear."
+DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
+SIMULATOR_ENABLED = os.getenv("SIMULATOR_ENABLED", "true").lower() == "true"
+DEMO_ROLES = ["admin", "manager", "supervisor", "maintenance", "operator"]
+
+app = FastAPI(title=f"{APP_NAME} API", version="1.0")
 
 DEVICES = []
 for i in range(1, 9): DEVICES.append({"id": f"IMM-{i:02d}", "type": "IMM"})
@@ -104,31 +123,98 @@ async def background_simulator_loop():
             print(f"Simulator error: {e}")
         await asyncio.sleep(5.0)
 
-def seed_database():
+def _get_or_create(db, model, defaults=None, **filters):
+    instance = db.query(model).filter_by(**filters).first()
+    if instance:
+        return instance
+    params = dict(filters)
+    params.update(defaults or {})
+    instance = model(**params)
+    db.add(instance)
+    db.flush()
+    return instance
+
+def seed_database(reset: bool = False):
     db = SessionLocal()
     try:
-        demo_admin_password = os.getenv("DEMO_ADMIN_PASSWORD", "admin123")
-        hashed_password = auth.get_password_hash(demo_admin_password)
-        admin_user = db.query(models.User).filter(models.User.username == "admin").first()
-        if admin_user:
-            print("[INIT] Resetting demo admin credentials...")
-            admin_user.email = "admin@example.com"
-            admin_user.password_hash = hashed_password
-            admin_user.role = "admin"
-            admin_user.active = True
-        else:
-            print("[INIT] Creating default admin user...")
-            new_admin = models.User(
-                username="admin",
-                email="admin@example.com",
-                password_hash=hashed_password,
-                role="admin",
-                active=True
+        if reset:
+            db.query(models.DowntimeEvent).delete()
+            db.query(models.TargetStandard).delete()
+            db.query(models.ShiftCalendar).delete()
+            db.query(models.AlertRule).delete()
+            db.query(models.ConnectorConfig).delete()
+            db.query(models.Telemetry).delete()
+            db.query(models.Alert).delete()
+            db.query(models.Equipment).delete()
+            db.query(models.MoldModel).delete()
+            db.query(models.Process).delete()
+            db.query(models.Cell).delete()
+            db.query(models.Line).delete()
+            db.query(models.Plant).delete()
+            db.query(models.Company).delete()
+            db.commit()
+
+        company = _get_or_create(db, models.Company, name="S7 Inc")
+        plant = _get_or_create(
+            db,
+            models.Plant,
+            company_id=company.id,
+            code="S7-PUNE-01",
+            defaults={"name": "Pune Automotive Components Plant"},
+        )
+        line_a = _get_or_create(db, models.Line, plant_id=plant.id, code="LINE-A", defaults={"name": "Molding Line A"})
+        line_b = _get_or_create(db, models.Line, plant_id=plant.id, code="LINE-B", defaults={"name": "Bumper Line B"})
+        molding = _get_or_create(db, models.Process, code="IMM", defaults={"name": "Injection Molding"})
+        qmc = _get_or_create(db, models.Process, code="QMC", defaults={"name": "Quick Mold Change"})
+        chilling = _get_or_create(db, models.Process, code="CHILLER", defaults={"name": "Cooling"})
+        robot = _get_or_create(db, models.Process, code="ROBOT", defaults={"name": "Take-out Robot"})
+        cutting = _get_or_create(db, models.Process, code="TCM", defaults={"name": "Trimming/Cutting"})
+        welding = _get_or_create(db, models.Process, code="VWM", defaults={"name": "Vibration Welding"})
+
+        mold_models = {}
+        for device_id, model_code in {
+            "IMM-01": "AB-X100", "IMM-02": "AB-X200", "IMM-03": "AB-Y50", "IMM-04": "AB-Z99",
+            "IMM-05": "AB-W150", "IMM-06": "AB-T300", "IMM-07": "AB-M75", "IMM-08": "AB-P200",
+        }.items():
+            mold_models[device_id] = _get_or_create(
+                db,
+                models.MoldModel,
+                model_code=model_code,
+                defaults={"part_name": f"Automotive bumper component {model_code}", "standard_cycle_time": 35.0, "cavity_count": 1},
             )
-            db.add(new_admin)
+
+        demo_admin_password = os.getenv("DEMO_ADMIN_PASSWORD", "admin123")
+        for role in DEMO_ROLES:
+            username = "admin" if role == "admin" else role
+            demo_user = db.query(models.User).filter(models.User.username == username).first()
+            if not demo_user:
+                demo_user = models.User(username=username, email=f"{username}@demo.gepulse.local", password_hash="", role=role)
+                db.add(demo_user)
+            demo_user.email = "admin@example.com" if role == "admin" else f"{username}@demo.gepulse.local"
+            demo_user.password_hash = auth.get_password_hash(demo_admin_password)
+            demo_user.role = role
+            demo_user.active = True
+            demo_user.session_timeout_minutes = auth.ACCESS_TOKEN_EXPIRE_MINUTES
 
         print("[INIT] Seeding equipment...")
         for device in DEVICES:
+            cell_number = device["id"].split("-")[-1] if "-" in device["id"] else "01"
+            line = line_a if int(cell_number) <= 4 else line_b
+            cell = _get_or_create(
+                db,
+                models.Cell,
+                line_id=line.id,
+                code=f"CELL-{cell_number}",
+                defaults={"name": f"Cell {cell_number}"},
+            )
+            process = {
+                "IMM": molding,
+                "QMC": qmc,
+                "CHILLER": chilling,
+                "ROBOT": robot,
+                "TCM": cutting,
+                "VWM": welding,
+            }.get(device["type"], molding)
             equipment = db.query(models.Equipment).filter(
                 models.Equipment.equipment_id == device["id"]
             ).first()
@@ -144,9 +230,60 @@ def seed_database():
                     active=True
                 )
                 db.add(eq)
+                equipment = eq
+            equipment.cell_id = cell.id
+            equipment.process_id = process.id
+            equipment.mold_model_id = mold_models.get(device["id"]).id if device["id"] in mold_models else None
+            equipment.plc_protocol = "mitsubishi_mc" if device["type"] == "IMM" else "simulator"
+            equipment.plc_address = f"192.168.10.{10 + len(device['id'])}"
+            equipment.cycle_time_standard = 35.0 if device["type"] == "IMM" else 30.0
+            equipment.target_per_hour = 240 if device["type"] == "IMM" else 180
+
+        for shift_name, starts_at, ends_at in [("A", "06:00", "14:00"), ("B", "14:00", "22:00"), ("C", "22:00", "06:00")]:
+            _get_or_create(
+                db,
+                models.ShiftCalendar,
+                plant_id=plant.id,
+                shift_name=shift_name,
+                defaults={"starts_at": starts_at, "ends_at": ends_at, "planned_downtime_minutes": 30},
+            )
+
+        for rule_name, metric_name, condition, threshold, severity, minutes, role in [
+            ("Cycle delay", "cycle_time", "gt", 42, "warning", 5, "supervisor"),
+            ("Temperature deviation", "mold_temp", "gt", 70, "critical", 15, "maintenance"),
+            ("High vibration", "vibration", "gt", 0.18, "critical", 30, "manager"),
+            ("Low OEE", "oee", "lt", 75, "warning", 30, "manager"),
+        ]:
+            _get_or_create(
+                db,
+                models.AlertRule,
+                name=rule_name,
+                defaults={
+                    "metric_name": metric_name,
+                    "condition": condition,
+                    "threshold": threshold,
+                    "severity": severity,
+                    "escalation_minutes": minutes,
+                    "target_role": role,
+                    "channels": ["email", "teams"],
+                },
+            )
+
+        for protocol, endpoint in [
+            ("mitsubishi_mc", "192.168.10.20:5007"),
+            ("modbus_tcp", "192.168.10.21:502"),
+            ("opc_ua", "opc.tcp://192.168.10.22:4840"),
+            ("mqtt", "mqtt://broker.local:1883/ge-pulse"),
+        ]:
+            _get_or_create(
+                db,
+                models.ConnectorConfig,
+                name=f"demo-{protocol}",
+                defaults={"protocol": protocol, "endpoint": endpoint, "tag_map": {"cycle_time": "D100", "status": "D101"}},
+            )
 
         db.commit()
-        print("[INIT] Demo admin and equipment seeded successfully.")
+        print("[INIT] Demo users, factory master, and equipment seeded successfully.")
     except Exception as e:
         print(f"Failed to seed DB: {e}")
     finally:
@@ -166,8 +303,9 @@ async def startup():
         print(f"[WARN] Database initialization failed: {e}")
         print("[WARN] Running in memory-only mode (data will not persist)")
     
-    asyncio.create_task(background_simulator_loop())
-    print("[OK] Internal Telemetry Simulator started")
+    if SIMULATOR_ENABLED:
+        asyncio.create_task(background_simulator_loop())
+        print("[OK] Internal Telemetry Simulator started")
 
 app.add_middleware(
     CORSMiddleware,
@@ -274,7 +412,37 @@ async def health_check():
         "status": "healthy" if db_status else "degraded",
         "database": "connected" if db_status else "disconnected",
         "api": "up",
+        "brand": {"name": APP_NAME, "owner": BRAND_OWNER, "tagline": TAGLINE},
+        "simulator": "running" if SIMULATOR_ENABLED else "disabled",
         "timestamp": str(datetime.now())
+    }
+
+@app.get("/api/v1/health")
+async def platform_health():
+    """Health checks for API, dashboard dependency, database, and simulator."""
+    db_status = check_db_connection()
+    return {
+        "status": "healthy" if db_status else "degraded",
+        "checks": {
+            "api": {"status": "up"},
+            "database": {"status": "connected" if db_status else "disconnected"},
+            "dashboard": {"status": "ready", "api_url": os.getenv("PUBLIC_API_URL", "local")},
+            "simulator": {"status": "running" if SIMULATOR_ENABLED else "disabled", "latest_devices": len(latest_telemetry)},
+        },
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+@app.get("/api/v1/health/dashboard")
+async def dashboard_health():
+    return {"status": "ready", "api": "reachable", "timestamp": datetime.utcnow().isoformat() + "Z"}
+
+@app.get("/api/v1/health/simulator")
+async def simulator_health():
+    return {
+        "status": "running" if SIMULATOR_ENABLED else "disabled",
+        "device_count": len(DEVICES),
+        "latest_devices": len(latest_telemetry),
+        "timestamp": datetime.utcnow().isoformat() + "Z",
     }
 
 @app.get("/api/v1/equipment")
@@ -284,6 +452,151 @@ async def list_equipment(db: Session = Depends(get_db)):
     return [
         EquipmentResponse.from_orm(e) for e in equipment
     ]
+
+@app.get("/api/v1/factory/machines")
+async def list_machine_master(db: Session = Depends(get_db)):
+    """List machine master data with plant/line/cell/process/mold context."""
+    equipment = db.query(models.Equipment).filter_by(active=True).all()
+    result = []
+    for item in equipment:
+        result.append({
+            "equipment_id": item.equipment_id,
+            "equipment_type": item.equipment_type,
+            "description": item.description,
+            "plant": item.cell.line.plant.name if item.cell and item.cell.line and item.cell.line.plant else None,
+            "line": item.cell.line.name if item.cell and item.cell.line else None,
+            "cell": item.cell.name if item.cell else None,
+            "process": item.process.name if item.process else None,
+            "mold_model": item.mold_model.model_code if item.mold_model else None,
+            "plc_protocol": item.plc_protocol,
+            "plc_address": item.plc_address,
+            "cycle_time_standard": item.cycle_time_standard,
+            "target_per_hour": item.target_per_hour,
+        })
+    return result
+
+@app.post("/api/v1/factory/machines")
+async def upsert_machine_master(
+    payload: MachineSetup,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_roles("admin", "manager")),
+):
+    company = _get_or_create(db, models.Company, name=BRAND_OWNER)
+    plant = _get_or_create(db, models.Plant, company_id=company.id, code=payload.plant.upper().replace(" ", "-"), defaults={"name": payload.plant})
+    line = _get_or_create(db, models.Line, plant_id=plant.id, code=payload.line.upper().replace(" ", "-"), defaults={"name": payload.line})
+    cell = _get_or_create(db, models.Cell, line_id=line.id, code=payload.cell.upper().replace(" ", "-"), defaults={"name": payload.cell})
+    process = _get_or_create(db, models.Process, code=payload.process.upper().replace(" ", "-"), defaults={"name": payload.process})
+    mold = None
+    if payload.mold_model:
+        mold = _get_or_create(
+            db,
+            models.MoldModel,
+            model_code=payload.mold_model,
+            defaults={"part_name": payload.mold_model, "standard_cycle_time": payload.cycle_time_standard},
+        )
+    equipment = db.query(models.Equipment).filter_by(equipment_id=payload.equipment_id).first()
+    if not equipment:
+        equipment = models.Equipment(equipment_id=payload.equipment_id, equipment_type=payload.equipment_type)
+        db.add(equipment)
+    equipment.equipment_type = payload.equipment_type
+    equipment.description = payload.description
+    equipment.cell_id = cell.id
+    equipment.process_id = process.id
+    equipment.mold_model_id = mold.id if mold else None
+    equipment.plc_protocol = payload.plc_protocol
+    equipment.plc_address = payload.plc_address
+    equipment.cycle_time_standard = payload.cycle_time_standard
+    equipment.target_per_hour = payload.target_per_hour
+    equipment.active = True
+    db.commit()
+    return {"status": "ok", "equipment_id": equipment.equipment_id}
+
+@app.get("/api/v1/oee", response_model=list[OeeResponse])
+async def calculate_oee(hours: int = 8, db: Session = Depends(get_db)):
+    """Calculate Availability x Performance x Quality and a basic loss tree."""
+    cutoff = datetime.utcnow() - timedelta(hours=hours)
+    equipment = db.query(models.Equipment).filter_by(active=True).all()
+    response = []
+    for item in equipment:
+        telemetry = db.query(models.Telemetry).filter(
+            models.Telemetry.equipment_id == item.equipment_id,
+            models.Telemetry.time >= cutoff,
+        ).all()
+        downtime_minutes = sum(
+            event.minutes for event in db.query(models.DowntimeEvent).filter(
+                models.DowntimeEvent.equipment_id == item.equipment_id,
+                models.DowntimeEvent.started_at >= cutoff,
+            ).all()
+        )
+        planned_minutes = max(hours * 60 - 30, 1)
+        availability = max(0.0, min(1.0, (planned_minutes - downtime_minutes) / planned_minutes))
+        cycle_values = [t.metric_value for t in telemetry if t.metric_name == "cycle_time" and t.metric_value]
+        avg_cycle = sum(cycle_values) / len(cycle_values) if cycle_values else item.cycle_time_standard
+        performance = max(0.0, min(1.0, item.cycle_time_standard / avg_cycle if avg_cycle else 1.0))
+        quality = 0.98
+        oee = availability * performance * quality
+        response.append({
+            "equipment_id": item.equipment_id,
+            "availability": round(availability * 100, 2),
+            "performance": round(performance * 100, 2),
+            "quality": round(quality * 100, 2),
+            "oee": round(oee * 100, 2),
+            "loss_tree": {
+                "downtime_minutes": round(downtime_minutes, 2),
+                "performance_loss_percent": round((1 - performance) * 100, 2),
+                "quality_loss_percent": round((1 - quality) * 100, 2),
+            },
+        })
+    return response
+
+@app.post("/api/v1/downtime")
+async def create_downtime(
+    payload: DowntimeCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_roles("admin", "manager", "supervisor", "maintenance", "operator")),
+):
+    equipment = db.query(models.Equipment).filter_by(equipment_id=payload.equipment_id).first()
+    if not equipment:
+        raise HTTPException(status_code=404, detail="Equipment not found")
+    event = models.DowntimeEvent(
+        equipment_id=payload.equipment_id,
+        reason_code=payload.reason_code,
+        category=payload.category,
+        minutes=payload.minutes,
+        comment=payload.comment,
+        acknowledged_by=current_user.id,
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+    return {"status": "ok", "id": event.id}
+
+@app.get("/api/v1/downtime/reasons")
+async def downtime_reasons():
+    return [
+        {"code": "MACHINE_STOP", "category": "machine stop", "label": "Machine stop"},
+        {"code": "MATERIAL_SHORTAGE", "category": "material shortage", "label": "Material shortage"},
+        {"code": "QUALITY_ISSUE", "category": "quality issue", "label": "Quality issue"},
+        {"code": "CHANGEOVER", "category": "changeover", "label": "Changeover"},
+        {"code": "MAINTENANCE", "category": "maintenance", "label": "Maintenance"},
+    ]
+
+@app.get("/api/v1/connectors")
+async def list_connectors(db: Session = Depends(get_db)):
+    connectors = db.query(models.ConnectorConfig).filter_by(active=True).all()
+    return [
+        {"name": c.name, "protocol": c.protocol, "endpoint": c.endpoint, "tag_map": c.tag_map}
+        for c in connectors
+    ]
+
+@app.post("/api/v1/demo/reset")
+async def reset_demo_data(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_roles("admin", "manager")),
+):
+    seed_database(reset=True)
+    latest_telemetry.clear()
+    return {"status": "ok", "message": "Demo factory data reset"}
 
 @app.websocket("/ws/andons")
 async def websocket_endpoint(websocket: WebSocket):
@@ -305,11 +618,35 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = auth.timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    if not user.active:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+    timeout_minutes = user.session_timeout_minutes or auth.ACCESS_TOKEN_EXPIRE_MINUTES
+    access_token_expires = auth.timedelta(minutes=timeout_minutes)
     access_token = auth.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username, "role": user.role}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    user.last_login = datetime.utcnow()
+    db.commit()
+    return {"access_token": access_token, "token_type": "bearer", "expires_in": timeout_minutes * 60, "role": user.role}
+
+@app.post("/api/v1/auth/demo-login", response_model=Token)
+async def demo_login(payload: DemoLogin, db: Session = Depends(get_db)):
+    """Create a demo session for a selected role without exposing passwords in the UI."""
+    if not DEMO_MODE:
+        raise HTTPException(status_code=404, detail="Demo mode is disabled")
+    role = auth.normalize_role(payload.role)
+    username = "admin" if role == "admin" else role
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if not user:
+        seed_database(reset=False)
+        user = db.query(models.User).filter(models.User.username == username).first()
+    timeout_minutes = user.session_timeout_minutes or auth.ACCESS_TOKEN_EXPIRE_MINUTES
+    access_token = auth.create_access_token(
+        data={"sub": user.username, "role": user.role}, expires_delta=auth.timedelta(minutes=timeout_minutes)
+    )
+    user.last_login = datetime.utcnow()
+    db.commit()
+    return {"access_token": access_token, "token_type": "bearer", "expires_in": timeout_minutes * 60, "role": user.role}
 
 @app.post("/register", response_model=UserResponse)
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -322,7 +659,7 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
         username=user.username,
         email=user.email,
         password_hash=hashed_password,
-        role=user.role
+        role=auth.normalize_role(user.role)
     )
     db.add(db_user)
     db.commit()

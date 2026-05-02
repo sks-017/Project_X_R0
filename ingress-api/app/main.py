@@ -303,11 +303,8 @@ def seed_database(reset: bool = False):
 async def startup():
     try:
         if check_db_connection():
-            if DATABASE_URL.startswith("sqlite"):
-                models.Base.metadata.create_all(bind=engine)
-                print("[OK] SQLite database initialized")
-            else:
-                print("[OK] Database connection successful. (Schema managed by Alembic)")
+            models.Base.metadata.create_all(bind=engine)
+            print("[OK] Database connection successful and schema created/verified")
             seed_database()
         else:
             print("[WARN] Database not available - running in memory-only mode")

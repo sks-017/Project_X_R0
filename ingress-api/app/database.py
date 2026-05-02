@@ -44,10 +44,9 @@ def get_db():
 
 def init_db():
     """Initialize database tables"""
-    if DATABASE_URL.startswith("sqlite"):
-        from app.models import Base
-        Base.metadata.create_all(bind=engine)
-        print("[OK] SQLite database tables created successfully")
+    from app.models import Base
+    Base.metadata.create_all(bind=engine)
+    print("[OK] Database tables created/verified successfully")
 
 def check_db_connection():
     """Health check for database connection"""

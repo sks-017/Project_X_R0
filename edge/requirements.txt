@@ -1,3 +1,7 @@
 requests
+pymcprotocol
+pymodbus
+asyncua
+paho-mqtt
 pymodbus
 paho-mqtt

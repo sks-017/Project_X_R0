@@ -54,7 +54,7 @@ with c2:
     )
     st.plotly_chart(fig2, use_container_width=True)
 st.subheader("📈 Power Consumption Trend (24h)")
-hours = pd.date_range(end=datetime.now(), periods=24, freq='H')
+hours = pd.date_range(end=datetime.now(), periods=24, freq='h')
 power_trend = pd.DataFrame({
     'Time': hours,
     'Power (kW)': [total_power * random.uniform(0.85, 1.15) for _ in range(24)]

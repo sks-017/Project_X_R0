@@ -5,8 +5,10 @@ import plotly.graph_objects as go
 import pandas as pd
 from datetime import datetime, timedelta
 import random
+import os
 st.set_page_config(page_title="Multi-Process Support", page_icon="🧵", layout="wide")
-API_URL = "http://localhost:8000/api/v1/telemetry/latest"
+API_BASE_URL = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
+API_URL = f"{API_BASE_URL}/api/v1/telemetry/latest"
 @st.cache_data(ttl=2)
 def fetch_data():
     try:
@@ -34,7 +36,7 @@ st.markdown("---")
 c1, c2 = st.columns(2)
 with c1:
     st.subheader("✂️ Tear Cutting Production")
-    hours = pd.date_range(end=datetime.now(), periods=12, freq='H')
+    hours = pd.date_range(end=datetime.now(), periods=12, freq='h')
     cutting_data = pd.DataFrame({
         'Time': hours,
         'TCM-01': [random.randint(80, 120) for _ in range(12)],
@@ -56,7 +58,7 @@ with c1:
     st.plotly_chart(fig1, use_container_width=True)
 with c2:
     st.subheader("🔧 Vibration Welding Performance")
-    hours = pd.date_range(end=datetime.now(), periods=12, freq='H')
+    hours = pd.date_range(end=datetime.now(), periods=12, freq='h')
     weld_data = pd.DataFrame({
         'Time': hours,
         'Good Welds %': [random.uniform(97, 99.5) for _ in range(12)]

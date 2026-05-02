@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+prodcontrol.db
+prodcontrol.db-shm
+prodcontrol.db-wal

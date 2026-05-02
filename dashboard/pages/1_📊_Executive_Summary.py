@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import plotly.graph_objects as go
 import random
 import sys
+import os
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.data_export import export_to_csv, export_machine_data
@@ -63,7 +64,8 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-API_URL = "http://localhost:8000/api/v1/telemetry/latest"
+API_BASE_URL = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
+API_URL = f"{API_BASE_URL}/api/v1/telemetry/latest"
 @st.cache_data(ttl=5)
 def fetch_data():
     try:
@@ -182,7 +184,7 @@ st.markdown("---")
 c1, c2 = st.columns(2)
 with c1:
     st.subheader("📈 Production Volume Trends (24h)")
-    hours = pd.date_range(end=datetime.now(), periods=24, freq='H')
+    hours = pd.date_range(end=datetime.now(), periods=24, freq='h')
     production_data = pd.DataFrame({
         'Time': hours,
         'Parts Produced': [random.randint(180, 260) for _ in range(24)],

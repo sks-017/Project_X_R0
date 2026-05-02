@@ -1,211 +1,147 @@
-# 🏭 Industrial Production Control System
+# Acron
 
-> Real-time Andon system for 8-cell injection molding lines. Handles 500+ tags/second via Mitsubishi MC Protocol. Built to replace manual logbooks.
+**Intelligence meets reality.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-
-## 📸 Preview
-![Dashboard](docs/screenshots/dashboard.png)
-
-## ✨ Features
-
-- **Real-Time OEE Monitoring** - Track Availability × Performance × Quality metrics
-- **48-Zone Thermal Heatmaps** - Interactive temperature monitoring for injection molding machines
-- **PLC Integration Ready** - Mitsubishi R Series (MC Protocol), Modbus, OPC UA support
-- **JWT Authentication** - Secure login with Role-Based Access Control (Admin, Manager, Operator)
-- **Beautiful Dark UI** - Industrial-grade dashboard with Plotly visualizations
-- **Data Export** - Export production data to CSV/Excel
-- **Multi-Machine Support** - Monitor 30+ machines simultaneously
-- **Multi-Process Support** - Specialized monitoring for Cutting (TCM) & Welding (VWM) machines
-
-### 🚀 Coming in V2.0
-- Predictive Maintenance (AI-powered RUL predictions)
-- TechMate AI Chat Assistant (Natural language queries)
-- Digital Twin (3D factory visualization)
-
-## 🎯 Who Is This For?
-
-- Automotive component manufacturers
-- Injection molding plants (8+ machines)
-- Factory automation integrators
-- Industrial IoT solution providers
-- Manufacturing consultants
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.10+
-- Windows/Linux/macOS
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/sks-017/Project_X_R0.git
-cd Project_X_R0
-
-# Install dependencies
-pip install -r ingress-api/requirements.txt
-pip install -r dashboard/requirements.txt
-pip install -r edge/requirements.txt
-```
-
-### Run Demo (3 Terminals)
-
-**Terminal 1: API**
-```bash
-cd ingress-api
-uvicorn app.main:app --reload --port 8000
-```
-
-**Terminal 2: Dashboard**
-```bash
-cd dashboard
-streamlit run Home.py
-```
-
-**Terminal 3: Data Gateway (Simulation)**
-```bash
-cd edge
-python gateway.py
-```
-
-**Login:** See `.env.example` for default demo credentials
-
-## 🏗️ Architecture
-
-```
-┌─────────────┐      ┌──────────┐      ┌───────────┐
-│   PLCs      │─────▶│ Gateway  │─────▶│    API    │
-│ (Machines)  │      │ (Edge)   │      │ (FastAPI) │
-└─────────────┘      └──────────┘      └─────┬─────┘
-                                              │
-                                        ┌─────▼─────┐
-                                        │ Dashboard │
-                                        │(Streamlit)│
-                                        └───────────┘
-```
-
-## 🔌 PLC Integration
-
-### Supported Protocols
-
-| Protocol | Status | Library | Use Case |
-|----------|--------|---------|----------|
-| **Mitsubishi R Series** | ✅ Ready | `pymcprotocol` | MC Protocol (binary) |
-| **Modbus TCP/RTU** | ✅ Ready | `pymodbus` | Universal PLC support |
-| **OPC UA** | ✅ Ready | `opcua-asyncio` | Modern industrial standard |
-| **MQTT** | ✅ Ready | `paho-mqtt` | Cloud-native IoT / Edge |
-
-### Implementation Details
-
-#### Mitsubishi MC Protocol
-```python
-from pymcprotocol import PLCClient
-
-plc = PLCClient("localhost", port=5007)
-plc.connect()
-cycle_time = plc.read("D100")  # Read data register
-```
-
-#### Modbus TCP
-```python
-from pymodbus.client import ModbusTcpClient
-
-client = ModbusTcpClient('192.168.1.100', port=502)
-registers = client.read_holding_registers(0, 10)
-```
-
-#### OPC UA
-```python
-from asyncua import Client
-
-client = Client("opc.tcp://localhost:4840")
-await client.connect()
-node = client.get_node("ns=2;i=2")
-value = await node.read_value()
-```
-
-**📖 See [Integration Guide](docs/MITSUBISHI_PLC_INTEGRATION.md) for complete setup instructions.**
-
-## 📊 Tech Stack
-
-- **Backend:** FastAPI, SQLAlchemy, Pydantic
-- **Frontend:** Streamlit, Plotly (3D charts, heatmaps)
-- **Database:** SQLite (dev) / PostgreSQL (production)
-- **Security:** JWT (python-jose), Password Hashing (passlib)
-- **Edge:** Python requests (batch ingestion)
-
-## 📁 Project Structure
-
-```
-├── ingress-api/       # FastAPI backend
-│   ├── app/
-│   │   ├── main.py           # API endpoints
-│   │   ├── auth.py           # JWT authentication
-│   │   ├── models.py         # Database models
-│   │   └── database.py       # Database connection
-│   └── requirements.txt
-├── dashboard/         # Streamlit frontend
-│   ├── Home.py               # Main dashboard
-│   ├── pages/                # Multi-page app
-│   └── utils/                # Alert system, exports
-├── edge/              # Data gateway (PLC simulator)
-│   └── gateway.py
-└── docs/              # Integration guides
-```
-
-## 🐳 Docker Deployment (Optional)
-
-```bash
-docker-compose up
-```
-
-Includes PostgreSQL with TimescaleDB for production-grade time-series data.
-
-## 📖 Documentation
-
-- [Startup Guide](STARTUP_GUIDE.md) - First-time setup
-- [Real Machine Integration](docs/REAL_MACHINE_INTEGRATION.md)
-- [Demo Script](docs/DEMO_SCRIPT.md) - Sales presentation guide
-
-## ⚠️ Known Limitations
-
-- **3D Visualization:** Robot position rendering requires WebGL enabled in the browser.
-- **Data Export:** Exporting >10,000 rows to CSV may cause browser lag on older machines.
-- **Refresh Rate:** Default 5s polling may saturate low-bandwidth networks (configurable in settings).
-
-## 💼 Commercial Use & Support
-
-**Free for:**
-- Personal projects
-- Educational institutions
-- Open-source projects
-
-**Commercial License Required for:**
-- Production deployments in factories
-- Revenue-generating applications
-
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## 📝 License
-
-Dual licensed:
-- MIT License (see [LICENSE](LICENSE)) for non-commercial use
-- Commercial License available - contact for pricing
-
-## 🙏 Acknowledgments
-
-Built with modern industrial IoT best practices for the automotive manufacturing industry.
+Acron is an industrial IoT intelligence platform from **S7 Corp** for injection molding and automotive component factories. It combines live machine telemetry, OEE analytics, AI-powered anomaly detection, predictive maintenance, and a premium dark-mode command center — built to scale from one production line to an entire plant network.
 
 ---
 
-**⭐ Star this repo if you find it useful!**
+## Architecture
 
-## 📬 Contact
-Built by [Sangam Kumar Shukla](https://www.linkedin.com/in/sangam-kumar-shukla-38a136362/) 
-Engineer | Maruti Suzuki India Limited
+```
+┌─────────────────────────────────────────────────────┐
+│                    ACRON PLATFORM                    │
+├─────────────────────┬───────────────────────────────┤
+│   React SPA (Vite)  │     FastAPI Backend (v2)      │
+│  ┌───────────────┐  │  ┌──────────┐ ┌───────────┐  │
+│  │ Command Center│  │  │ REST API │ │ WebSocket │  │
+│  │ Shop Floor    │  │  │ JWT/RBAC │ │ Telemetry │  │
+│  │ Analytics     │  │  │ OEE Eng  │ │ Broadcast │  │
+│  │ AI Insights   │  │  │ AI/ML    │ └───────────┘  │
+│  │ Machines      │  │  │ Analytics│                 │
+│  │ Downtime      │  │  └──────────┘                 │
+│  └───────────────┘  │                               │
+├─────────────────────┴───────────────────────────────┤
+│               PostgreSQL / TimescaleDB              │
+├─────────────────────────────────────────────────────┤
+│          Edge Gateway (MC / Modbus / OPC UA)        │
+└─────────────────────────────────────────────────────┘
+```
+
+## Features
+
+### Core Platform
+- **Real-time OEE** — Availability × Performance × Quality with loss-tree analysis
+- **Live Andon Board** — Cell-level status tiles with color-coded health indicators
+- **Machine Master** — Full factory hierarchy: Plant → Line → Cell → Machine → Process → Mold
+- **Downtime Capture** — Operator-grade reason coding with resolution workflow
+- **Role-Based Access** — Admin, Manager, Supervisor, Maintenance, Operator roles with JWT auth
+- **Edge Connectors** — Mitsubishi MC Protocol, Modbus TCP, OPC UA, MQTT, Simulator
+
+### AI Intelligence (V2)
+- **Anomaly Detection** — Statistical z-score analysis on telemetry streams
+- **Health Scoring** — Composite 0-100 score combining OEE, stability, and downtime
+- **Predictive Insights** — Equipment risk identification and trend analysis
+
+### Premium UI
+- **Dark-mode-first** design with glassmorphism and gradient accents
+- **Real-time WebSocket** telemetry updates
+- **SVG OEE gauges** with animated transitions
+- **Responsive layout** — desktop, tablet, and mobile breakpoints
+- **Inter typography** from Google Fonts
+
+## Quick Start
+
+### Backend API
+
+```bash
+cd ingress-api
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+### Frontend (React)
+
+```bash
+cd acron-ui
+npm install
+npm run dev
+```
+
+### Docker (Full Stack)
+
+```bash
+docker-compose up --build
+```
+
+**Open:**
+- Dashboard: http://localhost:3000
+- API Docs: http://localhost:8000/docs
+- API Health: http://localhost:8000/health
+- Legacy Dashboard: http://localhost:8501
+
+## Demo Credentials
+
+Use the **Launch Demo** buttons for passwordless role testing, or:
+
+```
+Username: admin
+Password: admin123
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/health` | GET | Platform health checks |
+| `/api/v1/auth/demo-login` | POST | Passwordless demo session |
+| `/api/v1/telemetry/latest` | GET | Latest telemetry for all equipment |
+| `/api/v1/factory/machines` | GET | Machine master data |
+| `/api/v1/oee` | GET | OEE calculations with loss tree |
+| `/api/v1/downtime` | POST | Log downtime event |
+| `/api/v1/analytics/oee-trend` | GET | Hourly OEE trend |
+| `/api/v1/analytics/downtime-summary` | GET | Downtime by category |
+| `/api/v1/ai/anomalies` | GET | AI anomaly detection |
+| `/api/v1/ai/health-scores` | GET | Equipment health scores |
+| `/ws/andons` | WebSocket | Real-time telemetry stream |
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite, Vanilla CSS, Recharts |
+| Backend | Python, FastAPI, SQLAlchemy, Pydantic |
+| Database | PostgreSQL, TimescaleDB |
+| Auth | JWT (python-jose), bcrypt (passlib) |
+| AI/ML | Statistical analysis, z-score detection |
+| Edge | MC Protocol, Modbus, OPC UA, MQTT |
+| Deploy | Docker Compose, Render, Nginx |
+
+## Deployment
+
+### Render Cloud
+
+```bash
+# render.yaml provisions:
+# - acron-postgres (free tier)
+# - acron-api (Docker)
+# - acron-dashboard (Docker)
+```
+
+### Docker Compose
+
+Includes TimescaleDB, API, React dashboard, legacy Streamlit dashboard, and edge gateway.
+
+## Roadmap
+
+- [x] V1.0 — Real-time OEE, PLC integration, JWT auth, Docker
+- [x] V2.0 — React SPA, AI anomaly detection, health scoring, analytics
+- [ ] V3.0 — TechMate AI assistant, digital twin, mobile app, multi-tenant SaaS
+
+## License
+
+MIT. Commercial deployment terms available for production factory use.
+
+---
+
+**Acron** by **S7 Corp** — *Intelligence meets reality.*

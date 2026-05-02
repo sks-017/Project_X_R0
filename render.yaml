@@ -1,0 +1,41 @@
+databases:
+  - name: acron-postgres
+    plan: free
+    databaseName: acron
+    user: acron
+
+services:
+  - type: web
+    name: acron-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./ingress-api/Dockerfile
+    dockerContext: ./ingress-api
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: acron-postgres
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEMO_MODE
+        value: "true"
+      - key: SIMULATOR_ENABLED
+        value: "true"
+      - key: SESSION_TIMEOUT_MINUTES
+        value: "30"
+      - key: DEMO_ADMIN_PASSWORD
+        value: admin123
+
+  - type: web
+    name: acron-dashboard
+    runtime: docker
+    plan: free
+    dockerfilePath: ./acron-ui/Dockerfile
+    dockerContext: ./acron-ui
+    autoDeployTrigger: commit
+    envVars:
+      - key: VITE_API_URL
+        value: https://acron-api.onrender.com

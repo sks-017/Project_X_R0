@@ -2,6 +2,7 @@
 import streamlit as st
 import requests
 import sys
+import os
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.alerts import AlertSystem
@@ -54,7 +55,8 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-API_URL = "http://localhost:8000/api/v1/telemetry/latest"
+API_BASE_URL = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
+API_URL = f"{API_BASE_URL}/api/v1/telemetry/latest"
 @st.cache_data(ttl=2)
 def fetch_data():
     try:

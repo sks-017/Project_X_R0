@@ -614,7 +614,11 @@ async def websocket_endpoint(websocket: WebSocket):
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """Login endpoint to get JWT token"""
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
-    if not user or not auth.verify_password(form_data.password, user.password_hash):
+    
+    # In demo mode, bypass password verification to prevent demo friction
+    is_password_valid = DEMO_MODE or (user and auth.verify_password(form_data.password, user.password_hash))
+    
+    if not user or not is_password_valid:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

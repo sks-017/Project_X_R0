@@ -36,7 +36,10 @@ services:
     restart: unless-stopped
 
   dashboard:
-    build: ./acron-ui
+    build:
+      context: ./acron-ui
+      args:
+        VITE_API_URL: http://localhost:8000
     container_name: acron_dashboard
     ports:
       - "3000:80"

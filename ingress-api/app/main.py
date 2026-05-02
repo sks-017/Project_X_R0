@@ -16,21 +16,21 @@ from .schemas import (
     OeeResponse,
 )
 from . import models, auth
-from .database import engine, get_db, init_db, check_db_connection, SessionLocal
+from .database import DATABASE_URL, engine, get_db, init_db, check_db_connection, SessionLocal
 from datetime import datetime, timedelta
 import json
 import asyncio
 import os
 import random
 
-APP_NAME = "GE Pulse"
-BRAND_OWNER = "S7 Inc"
-TAGLINE = "Factory rhythm, clear."
+APP_NAME = "Acron"
+BRAND_OWNER = "S7 Corp"
+TAGLINE = "Intelligence meets reality."
 DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
 SIMULATOR_ENABLED = os.getenv("SIMULATOR_ENABLED", "true").lower() == "true"
 DEMO_ROLES = ["admin", "manager", "supervisor", "maintenance", "operator"]
 
-app = FastAPI(title=f"{APP_NAME} API", version="1.0")
+app = FastAPI(title=f"{APP_NAME} API", version="2.0", description="Industrial IoT Intelligence Platform by S7 Corp")
 
 DEVICES = []
 for i in range(1, 9): DEVICES.append({"id": f"IMM-{i:02d}", "type": "IMM"})
@@ -154,7 +154,7 @@ def seed_database(reset: bool = False):
             db.query(models.Company).delete()
             db.commit()
 
-        company = _get_or_create(db, models.Company, name="S7 Inc")
+        company = _get_or_create(db, models.Company, name="S7 Corp")
         plant = _get_or_create(
             db,
             models.Plant,
@@ -293,10 +293,12 @@ def seed_database(reset: bool = False):
 async def startup():
     try:
         if check_db_connection():
-            models.Base.metadata.create_all(bind=engine)
-            print("[OK] Database initialized")
+            if DATABASE_URL.startswith("sqlite"):
+                models.Base.metadata.create_all(bind=engine)
+                print("[OK] SQLite database initialized")
+            else:
+                print("[OK] Database connection successful. (Schema managed by Alembic)")
             seed_database()
-            print("[OK] Database connection successful")
         else:
             print("[WARN] Database not available - running in memory-only mode")
     except Exception as e:
@@ -678,3 +680,46 @@ async def read_users_me(current_user: models.User = Depends(auth.get_current_act
         "created_at": current_user.created_at,
         "last_login": current_user.last_login,
     }
+
+
+# ═══════════════════════════════════════════
+# Phase 3 — Analytics Endpoints
+# ═══════════════════════════════════════════
+
+@app.get("/api/v1/analytics/oee-trend")
+async def oee_trend(hours: int = 24, db: Session = Depends(get_db)):
+    """Hourly OEE trend data for the specified time window."""
+    from .analytics import get_oee_trend
+    return get_oee_trend(db, hours=hours)
+
+
+@app.get("/api/v1/analytics/downtime-summary")
+async def downtime_summary(hours: int = 24, db: Session = Depends(get_db)):
+    """Aggregated downtime events by category."""
+    from .analytics import get_downtime_summary
+    return get_downtime_summary(db, hours=hours)
+
+
+@app.get("/api/v1/analytics/summary")
+async def analytics_summary(db: Session = Depends(get_db)):
+    """Consolidated analytics summary for the dashboard."""
+    from .analytics import get_dashboard_stats
+    return get_dashboard_stats(db)
+
+
+# ═══════════════════════════════════════════
+# Phase 4 — AI/ML Endpoints
+# ═══════════════════════════════════════════
+
+@app.get("/api/v1/ai/anomalies")
+async def ai_anomalies(hours: int = 4, db: Session = Depends(get_db)):
+    """Detect anomalous telemetry readings using statistical analysis."""
+    from .ml.anomaly import detect_anomalies
+    return detect_anomalies(db, hours=hours)
+
+
+@app.get("/api/v1/ai/health-scores")
+async def ai_health_scores(hours: int = 8, db: Session = Depends(get_db)):
+    """Compute composite health scores for all active equipment."""
+    from .ml.health_score import compute_health_scores
+    return compute_health_scores(db, hours=hours)

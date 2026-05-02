@@ -50,6 +50,7 @@ prodcontrol.db-shm
 
 # Logs
 *.log
+*.err
 logs/
 
 # Distribution / Packaging
@@ -74,3 +75,4 @@ dmypy.json
 brain/
 artifacts/
 *.pdf
+scripts/start_ge_pulse_*

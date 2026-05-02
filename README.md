@@ -1,110 +1,147 @@
-# GE Pulse
+# Acron
 
-**Factory rhythm, clear.**
+**Intelligence meets reality.**
 
-GE Pulse is a shop-floor intelligence platform from **S7 Inc** for injection molding and automotive component factories. It combines live machine telemetry, OEE, downtime capture, machine master data, role-based demo screens, and connector-ready edge ingestion.
+Acron is an industrial IoT intelligence platform from **S7 Corp** for injection molding and automotive component factories. It combines live machine telemetry, OEE analytics, AI-powered anomaly detection, predictive maintenance, and a premium dark-mode command center — built to scale from one production line to an entire plant network.
 
-## What Works Now
+---
 
-- FastAPI backend with JWT auth, demo mode, role-based access, and session timeout.
-- Streamlit dashboard branded for GE Pulse and S7 Inc.
-- Persistent database support for PostgreSQL on Render and local TimescaleDB/PostgreSQL through Docker.
-- Health checks for API, dashboard dependency, database, and simulator.
-- Demo factory seed/reset with plants, lines, cells, machines, processes, mold models, shifts, targets, alert rules, connector configs, and users.
-- Machine master API: plant, line, cell, machine, process, mold/model, PLC protocol, target, and cycle-time standard.
-- Downtime reason capture for machine stop, material shortage, quality issue, changeover, and maintenance.
-- OEE API with availability, performance, quality, and loss-tree output.
-- Edge connector interfaces for Mitsubishi MC Protocol, Modbus TCP, OPC UA, MQTT, and simulator mode.
-- Automated API tests and GitHub Actions CI.
+## Architecture
 
-## Demo Credentials
-
-Use the dashboard **Launch Demo** button for passwordless role testing.
-
-Local password login is also available:
-
-```text
-Username: admin
-Password: admin123
+```
+┌─────────────────────────────────────────────────────┐
+│                    ACRON PLATFORM                    │
+├─────────────────────┬───────────────────────────────┤
+│   React SPA (Vite)  │     FastAPI Backend (v2)      │
+│  ┌───────────────┐  │  ┌──────────┐ ┌───────────┐  │
+│  │ Command Center│  │  │ REST API │ │ WebSocket │  │
+│  │ Shop Floor    │  │  │ JWT/RBAC │ │ Telemetry │  │
+│  │ Analytics     │  │  │ OEE Eng  │ │ Broadcast │  │
+│  │ AI Insights   │  │  │ AI/ML    │ └───────────┘  │
+│  │ Machines      │  │  │ Analytics│                 │
+│  │ Downtime      │  │  └──────────┘                 │
+│  └───────────────┘  │                               │
+├─────────────────────┴───────────────────────────────┤
+│               PostgreSQL / TimescaleDB              │
+├─────────────────────────────────────────────────────┤
+│          Edge Gateway (MC / Modbus / OPC UA)        │
+└─────────────────────────────────────────────────────┘
 ```
 
-Set `DEMO_ADMIN_PASSWORD` to override the local demo password.
+## Features
+
+### Core Platform
+- **Real-time OEE** — Availability × Performance × Quality with loss-tree analysis
+- **Live Andon Board** — Cell-level status tiles with color-coded health indicators
+- **Machine Master** — Full factory hierarchy: Plant → Line → Cell → Machine → Process → Mold
+- **Downtime Capture** — Operator-grade reason coding with resolution workflow
+- **Role-Based Access** — Admin, Manager, Supervisor, Maintenance, Operator roles with JWT auth
+- **Edge Connectors** — Mitsubishi MC Protocol, Modbus TCP, OPC UA, MQTT, Simulator
+
+### AI Intelligence (V2)
+- **Anomaly Detection** — Statistical z-score analysis on telemetry streams
+- **Health Scoring** — Composite 0-100 score combining OEE, stability, and downtime
+- **Predictive Insights** — Equipment risk identification and trend analysis
+
+### Premium UI
+- **Dark-mode-first** design with glassmorphism and gradient accents
+- **Real-time WebSocket** telemetry updates
+- **SVG OEE gauges** with animated transitions
+- **Responsive layout** — desktop, tablet, and mobile breakpoints
+- **Inter typography** from Google Fonts
 
 ## Quick Start
 
-Install dependencies:
-
-```bash
-python -m pip install -r ingress-api/requirements.txt
-python -m pip install -r dashboard/requirements.txt
-python -m pip install -r edge/requirements.txt
-```
-
-Run the API:
+### Backend API
 
 ```bash
 cd ingress-api
+pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-Run the dashboard:
+### Frontend (React)
 
 ```bash
-cd dashboard
-streamlit run Home.py
+cd acron-ui
+npm install
+npm run dev
 ```
 
-Open:
-
-- API health: http://localhost:8000/health
-- API docs: http://localhost:8000/docs
-- Dashboard: http://localhost:8501
-
-## Docker Demo
+### Docker (Full Stack)
 
 ```bash
 docker-compose up --build
 ```
 
-The compose stack includes TimescaleDB/PostgreSQL, the API, the dashboard, and the simulator gateway.
+**Open:**
+- Dashboard: http://localhost:3000
+- API Docs: http://localhost:8000/docs
+- API Health: http://localhost:8000/health
+- Legacy Dashboard: http://localhost:8501
 
-## Render Deployment
+## Demo Credentials
 
-`render.yaml` provisions:
+Use the **Launch Demo** buttons for passwordless role testing, or:
 
-- `ge-pulse-postgres`
-- `ge-pulse-api`
-- `ge-pulse-dashboard`
+```
+Username: admin
+Password: admin123
+```
 
-The API receives `DATABASE_URL` from Render PostgreSQL. SQLite remains available only as a local fallback.
+## API Endpoints
 
-## API Highlights
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/health` | GET | Platform health checks |
+| `/api/v1/auth/demo-login` | POST | Passwordless demo session |
+| `/api/v1/telemetry/latest` | GET | Latest telemetry for all equipment |
+| `/api/v1/factory/machines` | GET | Machine master data |
+| `/api/v1/oee` | GET | OEE calculations with loss tree |
+| `/api/v1/downtime` | POST | Log downtime event |
+| `/api/v1/analytics/oee-trend` | GET | Hourly OEE trend |
+| `/api/v1/analytics/downtime-summary` | GET | Downtime by category |
+| `/api/v1/ai/anomalies` | GET | AI anomaly detection |
+| `/api/v1/ai/health-scores` | GET | Equipment health scores |
+| `/ws/andons` | WebSocket | Real-time telemetry stream |
 
-- `POST /api/v1/auth/demo-login`
-- `GET /api/v1/health`
-- `GET /api/v1/factory/machines`
-- `POST /api/v1/factory/machines`
-- `POST /api/v1/demo/reset`
-- `GET /api/v1/oee`
-- `POST /api/v1/downtime`
-- `GET /api/v1/connectors`
-- `GET /api/v1/telemetry/latest`
+## Tech Stack
 
-## Test
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite, Vanilla CSS, Recharts |
+| Backend | Python, FastAPI, SQLAlchemy, Pydantic |
+| Database | PostgreSQL, TimescaleDB |
+| Auth | JWT (python-jose), bcrypt (passlib) |
+| AI/ML | Statistical analysis, z-score detection |
+| Edge | MC Protocol, Modbus, OPC UA, MQTT |
+| Deploy | Docker Compose, Render, Nginx |
+
+## Deployment
+
+### Render Cloud
 
 ```bash
-pytest -q
+# render.yaml provisions:
+# - acron-postgres (free tier)
+# - acron-api (Docker)
+# - acron-dashboard (Docker)
 ```
+
+### Docker Compose
+
+Includes TimescaleDB, API, React dashboard, legacy Streamlit dashboard, and edge gateway.
 
 ## Roadmap
 
-1. Harden PostgreSQL migrations with Alembic.
-2. Build richer operator, supervisor, maintenance, manager, and admin screens.
-3. Add live Andon board, escalation workflow, and notification providers.
-4. Move high-volume telemetry to TimescaleDB hypertables or ClickHouse.
-5. Add edge offline buffering and production connector configuration UI.
-6. Add predictive maintenance and the GE Pulse AI assistant.
+- [x] V1.0 — Real-time OEE, PLC integration, JWT auth, Docker
+- [x] V2.0 — React SPA, AI anomaly detection, health scoring, analytics
+- [ ] V3.0 — TechMate AI assistant, digital twin, mobile app, multi-tenant SaaS
 
 ## License
 
-MIT. Commercial deployment terms can be added separately for production factory use.
+MIT. Commercial deployment terms available for production factory use.
+
+---
+
+**Acron** by **S7 Corp** — *Intelligence meets reality.*

@@ -27,10 +27,20 @@ APP_NAME = "Acron"
 BRAND_OWNER = "S7 Corp"
 TAGLINE = "Intelligence meets reality."
 DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
+from fastapi.middleware.cors import CORSMiddleware
+
 SIMULATOR_ENABLED = os.getenv("SIMULATOR_ENABLED", "true").lower() == "true"
 DEMO_ROLES = ["admin", "manager", "supervisor", "maintenance", "operator"]
 
 app = FastAPI(title=f"{APP_NAME} API", version="2.0", description="Industrial IoT Intelligence Platform by S7 Corp")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for the MVP
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 DEVICES = []
 for i in range(1, 9): DEVICES.append({"id": f"IMM-{i:02d}", "type": "IMM"})

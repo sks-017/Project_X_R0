@@ -6,6 +6,18 @@ Acron is an industrial IoT intelligence platform from **S7 Corp** for injection 
 
 ---
 
+## Dashboard Previews
+
+![Command Center](docs/assets/command-center.png)
+
+![OEE Breakdown](docs/assets/oee-breakdown.png)
+
+![Quality Management Dashboard](docs/assets/quality-dashboard.png)
+
+![Energy Monitoring Dashboard](docs/assets/energy-monitoring.png)
+
+---
+
 ## Architecture
 
 ```

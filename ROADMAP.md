@@ -17,10 +17,11 @@
 - Advanced analytics dashboards
 
 ## 🔜 V3.0 — Scale (Planned)
-- TechMate AI Chat Assistant (RAG-based)
-- Digital Twin 3D visualization
-- Bayesian fault prediction engine
-- Multi-tenant SaaS architecture
-- Mobile app (React Native)
-- TimescaleDB hypertables for high-volume telemetry
-- Edge offline buffering with sync
+- [x] TechMate AI Chat Assistant (RAG-based) (Implemented)
+- [ ] Digital Twin 3D visualization
+- [ ] Bayesian fault prediction engine
+- [ ] Multi-tenant SaaS architecture
+- [ ] Mobile app (React Native)
+- [ ] TimescaleDB hypertables for high-volume telemetry
+- [ ] Edge offline buffering with sync
+

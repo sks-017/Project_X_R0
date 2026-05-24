@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { id: 'machines', label: 'Machines', icon: '⚙' },
   { id: 'downtime', label: 'Downtime', icon: '⏱' },
   { id: 'ai', label: 'AI Insights', icon: '✧' },
+  { id: 'techmate', label: 'TechMate AI', icon: '🤖' },
   { id: 'settings', label: 'Settings', icon: '☰' },
 ]
 

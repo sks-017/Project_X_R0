@@ -46,6 +46,7 @@ export const api = {
   getAnalytics: () => request('/api/v1/analytics/summary').catch(() => null),
   getAiAnomalies: () => request('/api/v1/ai/anomalies').catch(() => []),
   getAiHealthScores: () => request('/api/v1/ai/health-scores').catch(() => []),
+  askTechMate: (message) => request('/api/v1/ai/chat', { method: 'POST', body: JSON.stringify({ message }) }),
 }
 
 export function connectWebSocket(onMessage) {

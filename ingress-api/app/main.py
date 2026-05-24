@@ -14,6 +14,8 @@ from .schemas import (
     DowntimeCreate,
     MachineSetup,
     OeeResponse,
+    ChatRequest,
+    ChatResponse,
 )
 from . import models, auth
 from .database import DATABASE_URL, engine, get_db, init_db, check_db_connection, SessionLocal
@@ -734,3 +736,11 @@ async def ai_health_scores(hours: int = 8, db: Session = Depends(get_db)):
     """Compute composite health scores for all active equipment."""
     from .ml.health_score import compute_health_scores
     return compute_health_scores(db, hours=hours)
+
+
+@app.post("/api/v1/ai/chat", response_model=ChatResponse)
+async def ai_chat(payload: ChatRequest, db: Session = Depends(get_db)):
+    """TechMate AI Chat Assistant endpoint for troubleshooting and machine diagnostics."""
+    from .ml.chat_assistant import generate_chat_response
+    return generate_chat_response(payload.message, db)
+

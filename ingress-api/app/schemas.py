@@ -115,3 +115,11 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     """Schema for token payload"""
     username: Optional[str] = None
+
+class ChatRequest(BaseModel):
+    message: str
+
+class ChatResponse(BaseModel):
+    response: str
+    context_used: List[str]
+

@@ -9,6 +9,7 @@ import Analytics from './pages/Analytics'
 import Machines from './pages/Machines'
 import Downtime from './pages/Downtime'
 import AiInsights from './pages/AiInsights'
+import TechMate from './pages/TechMate'
 import Settings from './pages/Settings'
 import { api } from './api/client'
 
@@ -19,6 +20,7 @@ const PAGE_TITLES = {
   machines: 'Machine Master',
   downtime: 'Downtime Capture',
   ai: 'AI Insights',
+  techmate: 'TechMate AI',
   settings: 'Settings',
 }
 
@@ -45,6 +47,7 @@ function AppShell() {
       case 'machines': return <Machines />
       case 'downtime': return <Downtime />
       case 'ai': return <AiInsights />
+      case 'techmate': return <TechMate />
       case 'settings': return <Settings />
       default: return <Dashboard />
     }

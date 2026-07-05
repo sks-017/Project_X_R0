@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import LoginPage from './auth/LoginPage'
 import Sidebar from './components/Sidebar'
@@ -24,9 +24,15 @@ const PAGE_TITLES = {
   settings: 'Settings',
 }
 
+function initialPage() {
+  const params = new URLSearchParams(window.location.search)
+  const page = params.get('page') || 'dashboard'
+  return Object.prototype.hasOwnProperty.call(PAGE_TITLES, page) ? page : 'dashboard'
+}
+
 function AppShell() {
   const { isAuthenticated } = useAuth()
-  const [page, setPage] = useState('dashboard')
+  const [page, setPage] = useState(initialPage)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [health, setHealth] = useState({})
 
@@ -36,6 +42,12 @@ function AppShell() {
     const id = setInterval(() => api.getHealth().then(setHealth), 15000)
     return () => clearInterval(id)
   }, [isAuthenticated])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    params.set('page', page)
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+  }, [page])
 
   if (!isAuthenticated) return <LoginPage />
 

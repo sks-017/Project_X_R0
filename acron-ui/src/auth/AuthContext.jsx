@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+﻿import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { api } from '../api/client'
 
 const AuthContext = createContext(null)
@@ -7,30 +7,50 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const token = localStorage.getItem('acron_token')
-    const saved = localStorage.getItem('acron_user')
-    if (token && saved) {
-      try { setUser(JSON.parse(saved)) } catch { localStorage.clear() }
-    }
-    setLoading(false)
+  const persistProfile = useCallback((profile, accessToken) => {
+    localStorage.setItem('acron_token', accessToken)
+    localStorage.setItem('acron_user', JSON.stringify(profile))
+    setUser(profile)
   }, [])
 
   const login = useCallback(async (username, password) => {
     const data = await api.login(username, password)
-    localStorage.setItem('acron_token', data.access_token)
     const profile = { username, role: data.role || 'operator' }
-    localStorage.setItem('acron_user', JSON.stringify(profile))
-    setUser(profile)
-  }, [])
+    persistProfile(profile, data.access_token)
+  }, [persistProfile])
 
   const demoLogin = useCallback(async (role) => {
     const data = await api.demoLogin(role)
-    localStorage.setItem('acron_token', data.access_token)
     const profile = { username: role === 'admin' ? 'admin' : role, role: data.role || role }
-    localStorage.setItem('acron_user', JSON.stringify(profile))
-    setUser(profile)
-  }, [])
+    persistProfile(profile, data.access_token)
+    return data
+  }, [persistProfile])
+
+  useEffect(() => {
+    const token = localStorage.getItem('acron_token')
+    const saved = localStorage.getItem('acron_user')
+    const params = new URLSearchParams(window.location.search)
+    const demoRole = params.get('demoRole')
+
+    if (token && saved) {
+      try {
+        setUser(JSON.parse(saved))
+        setLoading(false)
+        return
+      } catch {
+        localStorage.clear()
+      }
+    }
+
+    if (demoRole) {
+      demoLogin(demoRole)
+        .catch(() => {})
+        .finally(() => setLoading(false))
+      return
+    }
+
+    setLoading(false)
+  }, [demoLogin])
 
   const logout = useCallback(() => {
     localStorage.removeItem('acron_token')

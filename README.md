@@ -2,69 +2,80 @@
 
 **Intelligence meets reality.**
 
-Acron is an industrial IoT intelligence platform from **S7 Corp** for injection molding and automotive component factories. It combines live machine telemetry, OEE analytics, AI-powered anomaly detection, predictive maintenance, and a premium dark-mode command center — built to scale from one production line to an entire plant network.
+Acron is an industrial IoT intelligence platform from **S7 Corp** for injection molding and automotive component factories. It combines live machine telemetry, OEE analytics, downtime intelligence, connector commissioning, and AI-assisted operations in a modern plant command center.
 
 ---
 
-## Dashboard Previews
+## Live Demo Screens
 
-![Command Center](docs/assets/command-center.png)
+Captured from the current Acron V2 demo build with simulated plant telemetry and role-based demo access.
 
-![OEE Breakdown](docs/assets/oee-breakdown.png)
+![Acron Command Center](readme/acron-command-center.png)
 
-![Quality Management Dashboard](docs/assets/quality-dashboard.png)
+![Acron Factory Setup](readme/acron-factory-setup.png)
 
-![Energy Monitoring Dashboard](docs/assets/energy-monitoring.png)
+![Acron OEE Reporting](readme/acron-oee-reporting.png)
+
+![Acron Settings and Connector Commissioning](readme/acron-settings.png)
 
 ---
 
-## Architecture
+## What Acron Covers
 
+### Plant Operations
+- Real-time OEE with availability, performance, and quality views
+- Cell and line visibility through shop-floor and command-center dashboards
+- Downtime capture with reason codes and operator notes
+- Shift calendar management and target standard setup
+- Factory hierarchy management: plant -> line -> cell -> machine -> process -> mold/model
+
+### Industrial Connectivity
+- Mitsubishi MC Protocol
+- Modbus TCP
+- OPC UA
+- MQTT
+- Simulator path for demos and pre-commissioning
+
+### Intelligence Layer
+- OEE reporting by shift, day, and month
+- Loss-tree rollups by downtime category
+- Equipment health scoring
+- Anomaly detection on telemetry behavior
+- Role-aware screens for operator, supervisor, maintenance, manager, and admin users
+
+---
+
+## Platform Architecture
+
+```text
+React SPA (Vite)
+  -> Command Center
+  -> Shop Floor
+  -> OEE Reporting
+  -> Factory Setup
+  -> Downtime Capture
+  -> AI Insights
+  -> Settings / Connectors
+
+FastAPI Backend
+  -> JWT auth and demo mode
+  -> Telemetry ingestion
+  -> OEE engine and reporting
+  -> Shift and target standards
+  -> Connector configuration and probe APIs
+  -> AI and analytics endpoints
+  -> WebSocket telemetry broadcast
+
+Data + Edge
+  -> PostgreSQL / TimescaleDB path
+  -> Edge gateway connectors for PLC and IIoT protocols
 ```
-┌─────────────────────────────────────────────────────┐
-│                    ACRON PLATFORM                    │
-├─────────────────────┬───────────────────────────────┤
-│   React SPA (Vite)  │     FastAPI Backend (v2)      │
-│  ┌───────────────┐  │  ┌──────────┐ ┌───────────┐  │
-│  │ Command Center│  │  │ REST API │ │ WebSocket │  │
-│  │ Shop Floor    │  │  │ JWT/RBAC │ │ Telemetry │  │
-│  │ Analytics     │  │  │ OEE Eng  │ │ Broadcast │  │
-│  │ AI Insights   │  │  │ AI/ML    │ └───────────┘  │
-│  │ Machines      │  │  │ Analytics│                 │
-│  │ Downtime      │  │  └──────────┘                 │
-│  └───────────────┘  │                               │
-├─────────────────────┴───────────────────────────────┤
-│               PostgreSQL / TimescaleDB              │
-├─────────────────────────────────────────────────────┤
-│          Edge Gateway (MC / Modbus / OPC UA)        │
-└─────────────────────────────────────────────────────┘
-```
 
-## Features
-
-### Core Platform
-- **Real-time OEE** — Availability × Performance × Quality with loss-tree analysis
-- **Live Andon Board** — Cell-level status tiles with color-coded health indicators
-- **Machine Master** — Full factory hierarchy: Plant → Line → Cell → Machine → Process → Mold
-- **Downtime Capture** — Operator-grade reason coding with resolution workflow
-- **Role-Based Access** — Admin, Manager, Supervisor, Maintenance, Operator roles with JWT auth
-- **Edge Connectors** — Mitsubishi MC Protocol, Modbus TCP, OPC UA, MQTT, Simulator
-
-### AI Intelligence (V2)
-- **Anomaly Detection** — Statistical z-score analysis on telemetry streams
-- **Health Scoring** — Composite 0-100 score combining OEE, stability, and downtime
-- **Predictive Insights** — Equipment risk identification and trend analysis
-
-### Premium UI
-- **Dark-mode-first** design with glassmorphism and gradient accents
-- **Real-time WebSocket** telemetry updates
-- **SVG OEE gauges** with animated transitions
-- **Responsive layout** — desktop, tablet, and mobile breakpoints
-- **Inter typography** from Google Fonts
+---
 
 ## Quick Start
 
-### Backend API
+### Backend
 
 ```bash
 cd ingress-api
@@ -72,7 +83,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-### Frontend (React)
+### Frontend
 
 ```bash
 cd acron-ui
@@ -80,80 +91,74 @@ npm install
 npm run dev
 ```
 
-### Docker (Full Stack)
+### Open
+- Frontend: http://localhost:4173
+- API docs: http://localhost:8000/docs
+- API health: http://localhost:8000/api/v1/health
+- Legacy dashboard: http://localhost:8501
 
-```bash
-docker-compose up --build
-```
+---
 
-**Open:**
-- Dashboard: http://localhost:3000
-- API Docs: http://localhost:8000/docs
-- API Health: http://localhost:8000/health
-- Legacy Dashboard: http://localhost:8501
+## Demo Access
 
-## Demo Credentials
+Use the built-in demo role buttons on the login screen for passwordless access.
 
-Use the **Launch Demo** buttons for passwordless role testing, or:
+Default admin credentials are also available for local testing:
 
-```
+```text
 Username: admin
 Password: admin123
 ```
 
-## API Endpoints
+---
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
+## Key API Endpoints
+
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
 | `/api/v1/health` | GET | Platform health checks |
-| `/api/v1/auth/demo-login` | POST | Passwordless demo session |
-| `/api/v1/telemetry/latest` | GET | Latest telemetry for all equipment |
-| `/api/v1/factory/machines` | GET | Machine master data |
-| `/api/v1/oee` | GET | OEE calculations with loss tree |
-| `/api/v1/downtime` | POST | Log downtime event |
-| `/api/v1/analytics/oee-trend` | GET | Hourly OEE trend |
-| `/api/v1/analytics/downtime-summary` | GET | Downtime by category |
+| `/api/v1/auth/demo-login` | POST | Demo session launch |
+| `/api/v1/telemetry/latest` | GET | Latest telemetry by asset |
+| `/api/v1/factory/machines` | GET/POST | Machine master management |
+| `/api/v1/factory/shift-calendars` | GET/POST | Shift calendar management |
+| `/api/v1/factory/target-standards` | GET/POST | Target and cycle standard management |
+| `/api/v1/oee` | GET | Base OEE calculations |
+| `/api/v1/reports/oee` | GET | Shift/day/month OEE reporting |
+| `/api/v1/downtime` | POST | Downtime event capture |
+| `/api/v1/connectors` | GET/POST | Connector registry |
+| `/api/v1/connectors/test` | POST | Connector probe test |
 | `/api/v1/ai/anomalies` | GET | AI anomaly detection |
-| `/api/v1/ai/health-scores` | GET | Equipment health scores |
-| `/ws/andons` | WebSocket | Real-time telemetry stream |
+| `/api/v1/ai/health-scores` | GET | AI equipment health scoring |
+| `/ws/andons` | WebSocket | Live telemetry stream |
+
+---
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, Vite, Vanilla CSS, Recharts |
+| --- | --- |
+| Frontend | React 18, Vite, Vanilla CSS, Lucide |
 | Backend | Python, FastAPI, SQLAlchemy, Pydantic |
-| Database | PostgreSQL, TimescaleDB |
-| Auth | JWT (python-jose), bcrypt (passlib) |
-| AI/ML | Statistical analysis, z-score detection |
+| Database | PostgreSQL, TimescaleDB path |
+| Auth | JWT, demo mode, role-based access |
 | Edge | MC Protocol, Modbus, OPC UA, MQTT |
-| Deploy | Docker Compose, Render, Nginx |
-
-## Deployment
-
-### Render Cloud
-
-```bash
-# render.yaml provisions:
-# - acron-postgres (free tier)
-# - acron-api (Docker)
-# - acron-dashboard (Docker)
-```
-
-### Docker Compose
-
-Includes TimescaleDB, API, React dashboard, legacy Streamlit dashboard, and edge gateway.
-
-## Roadmap
-
-- [x] V1.0 — Real-time OEE, PLC integration, JWT auth, Docker
-- [x] V2.0 — React SPA, AI anomaly detection, health scoring, analytics
-- [ ] V3.0 — TechMate AI assistant, digital twin, mobile app, multi-tenant SaaS
-
-## License
-
-MIT. Commercial deployment terms available for production factory use.
+| Deployment | Docker Compose, Render, Nginx |
 
 ---
 
-**Acron** by **S7 Corp** — *Intelligence meets reality.*
+## Current Rollout Status
+
+- Phase 1 foundation in place for demo reliability
+- Phase 2 V2 rollout includes factory setup, target standards, connector testing, and OEE reporting
+- AI insight layer is active for anomaly and health views
+- Demo UI is branded as **Acron by S7 Corp**
+
+---
+
+## License
+
+MIT. Commercial deployment terms can be defined for production factory use.
+
+---
+
+**Acron** by **S7 Corp**

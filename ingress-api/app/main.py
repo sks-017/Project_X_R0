@@ -18,6 +18,7 @@ from .schemas import (
     ChatResponse,
 )
 from . import models, auth
+from .phase2 import router as phase2_router
 from .database import DATABASE_URL, engine, get_db, init_db, check_db_connection, SessionLocal
 from datetime import datetime, timedelta
 import json
@@ -34,7 +35,7 @@ from fastapi.middleware.cors import CORSMiddleware
 SIMULATOR_ENABLED = os.getenv("SIMULATOR_ENABLED", "true").lower() == "true"
 DEMO_ROLES = ["admin", "manager", "supervisor", "maintenance", "operator"]
 
-app = FastAPI(title=f"{APP_NAME} API", version="2.0", description="Industrial IoT Intelligence Platform by S7 Corp")
+app = FastAPI(title=f"{APP_NAME} API", version="2.1", description="Industrial IoT Intelligence Platform by S7 Corp")
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,6 +44,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(phase2_router)
 
 DEVICES = []
 for i in range(1, 9): DEVICES.append({"id": f"IMM-{i:02d}", "type": "IMM"})
@@ -695,9 +698,9 @@ async def read_users_me(current_user: models.User = Depends(auth.get_current_act
     }
 
 
-# ═══════════════════════════════════════════
-# Phase 3 — Analytics Endpoints
-# ═══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Phase 3 â€” Analytics Endpoints
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 @app.get("/api/v1/analytics/oee-trend")
 async def oee_trend(hours: int = 24, db: Session = Depends(get_db)):
@@ -720,9 +723,9 @@ async def analytics_summary(db: Session = Depends(get_db)):
     return get_dashboard_stats(db)
 
 
-# ═══════════════════════════════════════════
-# Phase 4 — AI/ML Endpoints
-# ═══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Phase 4 â€” AI/ML Endpoints
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 @app.get("/api/v1/ai/anomalies")
 async def ai_anomalies(hours: int = 4, db: Session = Depends(get_db)):
@@ -743,4 +746,7 @@ async def ai_chat(payload: ChatRequest, db: Session = Depends(get_db)):
     """TechMate AI Chat Assistant endpoint for troubleshooting and machine diagnostics."""
     from .ml.chat_assistant import generate_chat_response
     return generate_chat_response(payload.message, db)
+
+
+
 

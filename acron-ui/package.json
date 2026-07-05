@@ -1,9 +1,9 @@
 {
   "name": "acron-ui",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
-  "description": "Acron by S7 Corp — Intelligence meets reality. Premium industrial IoT dashboard.",
+  "description": "Acron by S7 Corp - Intelligence meets reality. Premium industrial IoT dashboard.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

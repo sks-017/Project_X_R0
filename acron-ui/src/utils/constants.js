@@ -2,7 +2,7 @@ export const BRAND = {
   name: 'Acron',
   owner: 'S7 Corp',
   tagline: 'Intelligence meets reality.',
-  version: '2.0',
+  version: '2.1',
 }
 
 export const API_BASE = import.meta.env.VITE_API_URL || ''
@@ -23,12 +23,12 @@ export function getStatusClass(value, thresholds = { critical: 75, watch: 85 }) 
   return 'stable'
 }
 
-export function formatNumber(n, decimals = 1) {
-  if (n == null) return '—'
-  return Number(n).toFixed(decimals)
+export function formatNumber(value, decimals = 1) {
+  if (value == null) return '-'
+  return Number(value).toFixed(decimals)
 }
 
-export function formatPercent(n) {
-  if (n == null) return '—'
-  return `${Number(n).toFixed(1)}%`
+export function formatPercent(value) {
+  if (value == null) return '-'
+  return `${Number(value).toFixed(1)}%`
 }

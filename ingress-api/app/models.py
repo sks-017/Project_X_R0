@@ -29,6 +29,7 @@ class Plant(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     company = relationship("Company", back_populates="plants")
     lines = relationship("Line", back_populates="plant")
+    shift_calendars = relationship("ShiftCalendar", back_populates="plant")
 
 class Line(Base):
     """Production line master."""
@@ -112,6 +113,7 @@ class ShiftCalendar(Base):
     planned_downtime_minutes = Column(Integer, default=30)
     active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    plant = relationship("Plant", back_populates="shift_calendars")
 
 class TargetStandard(Base):
     """Production targets and cycle-time standards."""
@@ -216,3 +218,5 @@ class AuditLog(Base):
     ip_address = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     user = relationship("User", back_populates="audit_logs")
+
+
